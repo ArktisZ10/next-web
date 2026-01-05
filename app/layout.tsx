@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Bars3Icon, Cog6ToothIcon } from "@heroicons/react/16/solid";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,12 +24,36 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased drawer`}>
+        <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content">
+          <header className="navbar bg-base-300 shadow-sm">
+            <div className="flex-none">
+              <label htmlFor="nav-drawer" className="btn btn-square btn-ghost">
+                <Bars3Icon className="h-5 w-5" />
+              </label>
+            </div>
+            <div className="flex-1">
+              <Link href="/" className="btn btn-ghost text-xl">Börne.se</Link>
+            </div>
+            <div className="flex-none">
+              <button className="btn btn-square btn-ghost">
+                <Cog6ToothIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </header>
+          {children}
+        </div>
+        <nav className="drawer-side">
+          <label htmlFor="nav-drawer" aria-label="close sidebar" className="drawer-overlay cursor-default" />
+          <ul className="menu bg-base-300 min-h-full w-80 p-4">
+            <li><Link href="/" className="btn btn-ghost text-2xl">Börne.se</Link></li>
+            <li><Link href="/boardgames">Board Games</Link></li>
+          </ul>
+        </nav>
       </body>
     </html>
   );

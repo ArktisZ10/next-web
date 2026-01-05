@@ -1,11 +1,15 @@
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-          Home Page
-        </h1>
-      </main>
+    <div className="hero min-h-screen">
+      <div className="hero-content text-center">
+        <div className="max-w-md">
+          <h1 className="text-5xl font-bold">Hello there</h1>
+          <p className="py-6">
+            Welcome to my website. Feel free to explore the collection of board games I have compiled.
+          </p>
+          <a href="/boardgames" className="btn btn-primary">To the boardgames!</a>
+        </div>
+      </div>
     </div>
   );
 }

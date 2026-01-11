@@ -14,6 +14,7 @@ export async function initORM() {
         entities: [Boardgame],
         clientUrl: process.env.MONGODB_URI,
         dbName: `${prefix}_next_web`,
+        debug: process.env.VERCEL_ENV !== 'production',
     });
     return orm;
 }

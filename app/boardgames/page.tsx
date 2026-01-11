@@ -1,3 +1,5 @@
+import { getEm } from "@/db/client";
+import { Boardgame } from "@/db/entities/Boardgame";
 
 const TableHeader = <tr>
     <td>Name</td>
@@ -6,47 +8,10 @@ const TableHeader = <tr>
     <td>Year Published</td>
 </tr>
 
-interface BoardGames {
-    name: string;
-    minPlayers: number;
-    maxPlayers: number;
-    minPlayTime: number;
-    maxPlayTime: number;
-    publisher?: string;
-    yearPublished?: number;
-}
+export default async function BoardGamesPage() {
+    const em = await getEm();
+    const boardGames = await em.find(Boardgame, {}, { orderBy: { name: 'desc' } });
 
-const boardGames: BoardGames[] = [
-    {
-        name: "Catan",
-        minPlayers: 3,
-        maxPlayers: 4,
-        minPlayTime: 60,
-        maxPlayTime: 120,
-        publisher: "Kosmos",
-        yearPublished: 1995,
-    },
-    {
-        name: "Pandemic",
-        minPlayers: 2,
-        maxPlayers: 4,
-        minPlayTime: 45,
-        maxPlayTime: 60,
-        publisher: "Z-Man Games",
-        yearPublished: 2008,
-    },
-    {
-        name: "Ticket to Ride",
-        minPlayers: 2,
-        maxPlayers: 5,
-        minPlayTime: 30,
-        maxPlayTime: 60,
-        publisher: "Days of Wonder",
-        yearPublished: 2004,
-    },
-];
-
-export default function BoardGames() {
     return (
         <div className="p-8">
             <table className="table table-xs table-pin-rows table-pin-cols">

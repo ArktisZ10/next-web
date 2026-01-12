@@ -2,8 +2,10 @@
   "name": "nextjs",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "rimraf dist && tsc -p tsconfig.mikro-orm.json",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -12,6 +14,7 @@
     "@heroicons/react": "^2.2.0",
     "@mikro-orm/core": "^6.6.3",
     "@mikro-orm/mongodb": "^6.6.3",
+    "@mikro-orm/reflection": "^6.6.3",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -24,6 +27,7 @@
     "daisyui": "^5.5.14",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "rimraf": "^6.1.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -1,5 +1,5 @@
 import { MikroORM } from '@mikro-orm/mongodb';
-import { Boardgame } from './entities/Boardgame';
+import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
 let orm: MikroORM | null = null;
 
@@ -11,9 +11,10 @@ export async function initORM() {
     const prefix = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
 
     orm = await MikroORM.init({
-        entities: [Boardgame],
+        entities: ['./dist/'],
         clientUrl: process.env.MONGODB_URI,
         dbName: `${prefix}_next_web`,
+        metadataProvider: TsMorphMetadataProvider,
         debug: process.env.VERCEL_ENV !== 'production',
     });
     return orm;

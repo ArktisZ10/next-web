@@ -1,6 +1,8 @@
 import { getEm } from "@/db/client";
 import { type Boardgame } from "@/db/entities/Boardgame";
 
+export const revalidate = 600;
+
 const TableHeader = <tr>
     <td>Name</td>
     <td>Players</td>

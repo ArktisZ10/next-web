@@ -1,5 +1,4 @@
-import { getEm } from "@/db/client";
-import { type Boardgame } from "@/db/entities/Boardgame";
+import { boardgames } from "@/db/entities/Boardgame";
 
 export const revalidate = 600;
 
@@ -11,8 +10,7 @@ const TableHeader = <tr>
 </tr>
 
 export default async function BoardGamesPage() {
-    const em = await getEm();
-    const boardGames = await em.find<Boardgame>("Boardgame", {}, { orderBy: { name: 'desc' } });
+    const boardGames = await boardgames.find({}, { sort: { name: -1 } }).toArray();
 
     return (
         <div className="p-8">

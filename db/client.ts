@@ -1,35 +1,22 @@
-import { MikroORM } from '@mikro-orm/mongodb';
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { MongoClient } from "mongodb";
+import { attachDatabasePool } from "@vercel/functions";
+import { type Document } from "mongodb";
+import { type Boardgame } from "./entities/Boardgame";
 
-let orm: MikroORM | null = null;
+if (!process.env.MONGODB_URI) {
+    throw new Error("Missing MONGODB_URI environment variable");
+}
 
-export async function initORM() {
-    if (orm) return orm;
-    if (!process.env.MONGODB_URI)
-        throw new Error('MONGODB_URI environment variable is not set');
+const client = new MongoClient(process.env.MONGODB_URI);
+attachDatabasePool(client);
 
+function database() {
     const prefix = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
-
-    orm = await MikroORM.init({
-        entities: ['./dist/'],
-        clientUrl: process.env.MONGODB_URI,
-        dbName: `${prefix}_next_web`,
-        metadataProvider: TsMorphMetadataProvider,
-        debug: process.env.VERCEL_ENV !== 'production',
-    });
-    return orm;
+    const dbName = `${prefix}_next_web`;
+    return client.db(dbName);
 }
 
-/**
- * Use `getEm()` inside server code (API routes, server components) to get a forked EntityManager.
- */
-export async function getEm() {
-    const ormInstance = await initORM();
-    return ormInstance.em.fork();
-}
-
-export async function closeORM() {
-    if (!orm) return;
-    await orm.close(true);
-    orm = null;
+export async function getCollection<T extends Document>(name: string) {
+    const db = database();
+    return db.collection<T>(name);
 }

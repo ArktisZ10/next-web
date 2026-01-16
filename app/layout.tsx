@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Bars3Icon, Cog6ToothIcon } from "@heroicons/react/16/solid";
+import { Bars3Icon } from "@heroicons/react/16/solid";
 import Link from "next/link";
+import { UserMenu } from "./_components/UserMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,11 +40,7 @@ export default function RootLayout({
             <div className="flex-1">
               <Link href="/" className="btn btn-ghost text-xl">Börne.se</Link>
             </div>
-            <div className="flex-none">
-              <button className="btn btn-square btn-ghost">
-                <Cog6ToothIcon className="h-5 w-5" />
-              </button>
-            </div>
+            <UserMenu />
           </header>
           {children}
         </div>

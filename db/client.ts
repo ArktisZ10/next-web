@@ -1,7 +1,6 @@
 import { MongoClient } from "mongodb";
 import { attachDatabasePool } from "@vercel/functions";
 import { type Document } from "mongodb";
-import { type Boardgame } from "./entities/Boardgame";
 
 if (!process.env.MONGODB_URI) {
     throw new Error("Missing MONGODB_URI environment variable");

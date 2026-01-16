@@ -16,6 +16,8 @@ interface UpsertModalProps {
 
 export default function UpsertModal({editObject, action, dialogRef}: UpsertModalProps) {
     return <dialog ref={dialogRef} className="modal overflow-auto">
+                    <form action={action}>
+
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
                     <legend className="text-lg font-bold bg-base-200 rounded-xl px-2">{editObject ? "Edit Boardgame" : "New Boardgame"}</legend>
                     <label className="label">Title</label>
@@ -54,5 +56,5 @@ export default function UpsertModal({editObject, action, dialogRef}: UpsertModal
                     </div>
                 </fieldset>
             </form>
-        </dialog >
+        </dialog>
 }

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Bars3Icon, Cog6ToothIcon } from "@heroicons/react/16/solid";
+import { Bars3Icon } from "@heroicons/react/16/solid";
 import Link from "next/link";
+import { UserMenu } from "./_components/UserMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased drawer`}>
         <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          <header className="navbar bg-base-300 shadow-sm">
+          <header className="navbar bg-base-300 shadow-sm relative z-50">
             <div className="flex-none">
               <label htmlFor="nav-drawer" className="btn btn-square btn-ghost">
                 <Bars3Icon className="h-5 w-5" />
@@ -39,11 +40,7 @@ export default function RootLayout({
             <div className="flex-1">
               <Link href="/" className="btn btn-ghost text-xl">Börne.se</Link>
             </div>
-            <div className="flex-none">
-              <button className="btn btn-square btn-ghost">
-                <Cog6ToothIcon className="h-5 w-5" />
-              </button>
-            </div>
+            <UserMenu />
           </header>
           {children}
         </div>

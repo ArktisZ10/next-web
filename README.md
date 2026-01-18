@@ -1,6 +1,38 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+- **Authentication**: Secure user authentication using [NextAuth.js v5](https://authjs.dev/) with credentials provider
+- **Database**: MongoDB for storing user credentials and application data
+- **UI**: Built with [Tailwind CSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/)
+
 ## Getting Started
+
+### Prerequisites
+
+- Node.js 20+ installed
+- MongoDB instance running locally or remotely
+
+### Environment Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Update the environment variables in `.env.local`:
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `AUTH_SECRET`: Generate a secret key using `openssl rand -base64 32`
+
+### Installation
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+### Running the Development Server
 
 First, run the development server:
 
@@ -19,6 +51,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Authentication
+
+The application includes a complete authentication system:
+
+- **Sign Up**: Create a new account at `/signup`
+- **Login**: Sign in at `/login` with your username and password
+- **Logout**: Click on your user avatar in the navbar to logout
+- **Protected Routes**: User sessions are managed with JWT tokens
+
+User passwords are securely hashed using bcrypt before being stored in the database.
 
 ## Learn More
 

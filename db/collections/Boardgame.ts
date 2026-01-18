@@ -70,7 +70,8 @@ export async function getBoardgames(): Promise<BoardgameEntity[]> {
 
 export async function insertBoardgame(boardgame: Boardgame) {
   const collection = await boardgameCollection();
-  return await collection.insertOne(boardgame as BoardgameDoc);
+  const doc: Omit<BoardgameDoc, '_id'> = { ...boardgame, id: undefined };
+  return await collection.insertOne(doc as BoardgameDoc);
 }
 
 export async function updateBoardgame(id: string, updates: Partial<Boardgame>) {

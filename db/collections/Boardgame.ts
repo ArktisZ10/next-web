@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { getCollection } from "../client";
 
 
@@ -10,6 +10,10 @@ interface Boardgame {
   maxPlayTime?: number
   publisher?: string
   yearPublished?: number
+  addedBy?: string
+  addedAt?: Date
+  updatedBy?: string
+  updatedAt?: Date
 }
 
 export interface BoardgameDoc extends Boardgame {
@@ -27,14 +31,6 @@ function toBoardgameEntity(doc: BoardgameDoc): BoardgameEntity {
     ...doc,
     id: doc._id.toString(),
     _id: undefined,
-  };
-}
-
-function fromBoardgameEntity(entity: BoardgameEntity): BoardgameDoc {
-  return {
-    ...entity,
-    _id: new ObjectId(entity.id),
-    id: undefined,
   };
 }
 
@@ -72,17 +68,16 @@ export async function getBoardgames(): Promise<BoardgameEntity[]> {
   return boardgames.map(toBoardgameEntity);
 }
 
-export async function insertBoardgame(boardgame: BoardgameEntity) {
+export async function insertBoardgame(boardgame: Boardgame) {
   const collection = await boardgameCollection();
-  return await collection.insertOne(fromBoardgameEntity(boardgame));
+  return await collection.insertOne(boardgame as BoardgameDoc);
 }
 
-export async function updateBoardgame(boardgame: BoardgameEntity) {
+export async function updateBoardgame(id: string, updates: Partial<Boardgame>) {
   const collection = await boardgameCollection();
-  const { _id, id, ...updateFields } = fromBoardgameEntity(boardgame);
   return await collection.updateOne(
-    { _id: new ObjectId(boardgame.id) },
-    { $set: updateFields }
+    { _id: new ObjectId(id) },
+    { $set: updates }
   );
 }
 

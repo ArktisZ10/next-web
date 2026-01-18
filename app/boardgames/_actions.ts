@@ -2,23 +2,39 @@
 
 import { insertBoardgame, updateBoardgame, deleteBoardgame, fromFormData } from "@/db/collections/Boardgame";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function addBoardgameAction(formData: FormData) {
+    const session = await auth();
+    
+    if (!session?.user?.id) {
+        throw new Error('User must be authenticated');
+    }
+
     const boardgame = fromFormData(formData);
 
-    await insertBoardgame(boardgame);
+    await insertBoardgame({
+        ...boardgame,
+        addedBy: session.user.id,
+        addedAt: new Date(),
+    });
     revalidatePath('/boardgames');
 }
 
 export async function editBoardgameAction(id: string, formData: FormData) {
+    const session = await auth();
+    
+    if (!session?.user?.id) {
+        throw new Error('User must be authenticated');
+    }
+
     const boardgame = fromFormData(formData);
 
-    const updatedBoardgame = {
+    await updateBoardgame(id, {
         ...boardgame,
-        id: id,
-    };
-    
-    await updateBoardgame(updatedBoardgame);
+        updatedBy: session.user.id,
+        updatedAt: new Date(),
+    });
     revalidatePath('/boardgames');
 }
 

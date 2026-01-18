@@ -23,7 +23,6 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 2. Update the environment variables in `.env.local`:
    - `MONGODB_URI`: Your MongoDB connection string
    - `AUTH_SECRET`: Generate a secret key using `openssl rand -base64 32`
-   - `AUTH_URL`: Your application URL (e.g., `http://localhost:3000`)
 
 ### Installation
 

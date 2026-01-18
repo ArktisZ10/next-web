@@ -31,7 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased drawer`}>
         <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          <header className="navbar bg-base-300 shadow-sm">
+          <header className="navbar bg-base-300 shadow-sm relative z-50">
             <div className="flex-none">
               <label htmlFor="nav-drawer" className="btn btn-square btn-ghost">
                 <Bars3Icon className="h-5 w-5" />

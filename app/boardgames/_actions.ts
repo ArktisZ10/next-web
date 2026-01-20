@@ -44,6 +44,14 @@ export async function editBoardgameAction(id: string, formData: FormData) {
 }
 
 export async function removeBoardgame(formData: FormData) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+    
+    if (!session?.user?.id) {
+        throw new Error('User must be authenticated');
+    }
+
     const id = formData.get('id')?.toString();
     if (!id) {
         throw new Error('ID is required');

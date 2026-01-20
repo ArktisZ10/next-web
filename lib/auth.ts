@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
+import { nextCookies } from "better-auth/next-js";
 
 const mongoClient = new MongoClient(process.env.MONGODB_URI!);
 
@@ -9,17 +10,14 @@ export const auth = betterAuth({
     client: mongoClient,
   },
   secret: process.env.AUTH_SECRET!,
-  emailAndPassword: {
-    enabled: true,
-  },
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 minutes
+  socialProviders: {
+    discord: {
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     },
   },
+  plugins: [nextCookies()],
   advanced: {
-    generateId: false,
     useSecureCookies: process.env.NODE_ENV === "production",
   },
 });

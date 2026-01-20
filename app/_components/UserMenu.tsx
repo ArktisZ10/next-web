@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { UserIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
+import Image from "next/image";
 import { LogoutButton } from "./LogoutButton";
 import { unstable_noStore as noStore } from "next/cache";
 import { headers } from "next/headers";
@@ -14,11 +15,8 @@ export async function UserMenu() {
   if (!session?.user) {
     return (
       <div className="flex-none gap-2">
-        <Link href="/login" className="btn btn-ghost btn-sm">
-          Login
-        </Link>
-        <Link href="/signup" className="btn btn-primary btn-sm">
-          Sign Up
+        <Link href="/api/auth/discord" className="btn btn-primary btn-sm">
+          Login with Discord
         </Link>
       </div>
     );
@@ -28,8 +26,20 @@ export async function UserMenu() {
     <div className="flex-none gap-2">
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center">
-            <UserIcon className="h-6 w-6" />
+          <div className="w-10 h-10 rounded-full overflow-hidden">
+            {session.user.image ? (
+              <Image 
+                src={session.user.image} 
+                alt={session.user.name || "User"} 
+                width={40} 
+                height={40}
+                className="rounded-full"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <UserIcon className="h-6 w-6" />
+              </div>
+            )}
           </div>
         </div>
         <ul

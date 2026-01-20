@@ -12,7 +12,7 @@ export function LogoutButton() {
       className="w-full text-left"
       onClick={async () => {
         await signOut();
-        router.push("/login");
+        router.push("/");
       }}
     >
       Logout

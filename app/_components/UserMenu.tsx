@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth";
 import { UserIcon } from "@heroicons/react/16/solid";
-import Link from "next/link";
 import Image from "next/image";
 import { LogoutButton } from "./LogoutButton";
 import { unstable_noStore as noStore } from "next/cache";
 import { headers } from "next/headers";
+import { DiscordLoginButton } from "./DiscordLoginButton";
 
 export async function UserMenu() {
   noStore();
@@ -15,9 +15,7 @@ export async function UserMenu() {
   if (!session?.user) {
     return (
       <div className="flex-none gap-2">
-        <Link href="/api/auth/discord" className="btn btn-primary btn-sm">
-          Login with Discord
-        </Link>
+        <DiscordLoginButton className="btn btn-primary btn-sm" />
       </div>
     );
   }
@@ -42,10 +40,7 @@ export async function UserMenu() {
             )}
           </div>
         </div>
-        <ul
-          tabIndex={0}
-          className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-52 p-2 shadow"
-        >
+          <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-100 mt-3 w-52 p-2 shadow">
           <li className="menu-title">
             <span>{session.user.name}</span>
           </li>

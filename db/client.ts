@@ -9,13 +9,17 @@ if (!process.env.MONGODB_URI) {
 const client = new MongoClient(process.env.MONGODB_URI);
 attachDatabasePool(client);
 
-function database() {
+export function getDb() {
     const prefix = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
     const dbName = `${prefix}_next_web`;
     return client.db(dbName);
 }
 
 export async function getCollection<T extends Document>(name: string) {
-    const db = database();
+    const db = getDb();
     return db.collection<T>(name);
+}
+
+export function getMongoClient() {
+    return client;
 }

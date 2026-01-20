@@ -1,18 +1,17 @@
 "use client";
 
 import { signOut } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 
 export function LogoutButton() {
-  const router = useRouter();
-  
   return (
     <button
       type="button"
       className="w-full text-left"
       onClick={async () => {
         await signOut();
-        router.push("/");
+        // Hard reload guarantees server components (like the header UserMenu)
+        // re-render using the now-cleared auth cookie.
+        window.location.assign("/");
       }}
     >
       Logout

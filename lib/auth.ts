@@ -1,19 +1,28 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
 import { nextCookies } from "better-auth/next-js";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { getDb } from "@/db/client";
 
-const mongoClient = new MongoClient(process.env.MONGODB_URI!);
+function requiredEnv(name: string) {
+	const value = process.env[name];
+	if (!value) {
+		throw new Error(`Missing ${name} environment variable`);
+	}
+	return value;
+}
+
+const db = getDb();
 
 export const auth = betterAuth({
-  database: {
-    type: "mongodb",
-    client: mongoClient,
-  },
-  secret: process.env.AUTH_SECRET!,
+  database: mongodbAdapter(db, {
+	// Avoid requiring replica-set transactions by default.
+	transaction: false,
+  }),
+  secret: requiredEnv("AUTH_SECRET"),
   socialProviders: {
     discord: {
-      clientId: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      clientId: requiredEnv("DISCORD_CLIENT_ID"),
+      clientSecret: requiredEnv("DISCORD_CLIENT_SECRET"),
     },
   },
   plugins: [nextCookies()],

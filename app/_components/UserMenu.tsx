@@ -1,12 +1,15 @@
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { UserIcon } from "@heroicons/react/16/solid";
 import Link from "next/link";
 import { LogoutButton } from "./LogoutButton";
 import { unstable_noStore as noStore } from "next/cache";
+import { headers } from "next/headers";
 
 export async function UserMenu() {
   noStore();
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session?.user) {
     return (

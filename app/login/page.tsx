@@ -1,7 +1,6 @@
-import { signIn } from "@/auth";
 import Link from "next/link";
-import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export default async function LoginPage({
   searchParams,
@@ -29,7 +28,7 @@ export default async function LoginPage({
           {error ? (
             <div className="alert alert-error rounded-none">
               <span>
-                {error === "CredentialsSignin"
+                {error === "CredentialsSignin" || error === "invalid_credentials"
                   ? "Invalid username or password."
                   : "Sign in failed. Please try again."}
               </span>
@@ -40,36 +39,36 @@ export default async function LoginPage({
             action={async (formData) => {
               "use server";
               try {
-                const username = formData.get("username");
+                const email = formData.get("username");
                 const password = formData.get("password");
                 const redirectTo = formData.get("redirectTo");
 
-                await signIn("credentials", {
-                  username,
-                  password,
-                  redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
-                });
-              } catch (err) {
-                const authErrorType =
-                  err instanceof AuthError
-                    ? err.type
-                    : err &&
-                        typeof err === "object" &&
-                        "type" in err &&
-                        typeof (err as { type?: unknown }).type === "string"
-                      ? (err as { type: string }).type
-                      : null;
-
-                if (authErrorType) {
+                if (!email || !password) {
                   const params = new URLSearchParams();
-                  params.set("error", authErrorType);
+                  params.set("error", "invalid_credentials");
                   const rt = formData.get("redirectTo");
                   if (typeof rt === "string" && rt.length > 0) {
                     params.set("redirectTo", rt);
                   }
                   redirect(`/login?${params.toString()}`);
                 }
-                throw err;
+
+                await auth.api.signInEmail({
+                  body: {
+                    email: email as string,
+                    password: password as string,
+                  },
+                });
+
+                redirect(typeof redirectTo === "string" ? redirectTo : "/");
+              } catch {
+                const params = new URLSearchParams();
+                params.set("error", "invalid_credentials");
+                const rt = formData.get("redirectTo");
+                if (typeof rt === "string" && rt.length > 0) {
+                  params.set("redirectTo", rt);
+                }
+                redirect(`/login?${params.toString()}`);
               }
             }}
           >

@@ -1,7 +1,7 @@
 "use server";
 
-import { createUser } from "@/db/collections/User";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export async function signupAction(formData: FormData): Promise<void> {
   const username = formData.get("username")?.toString();
@@ -20,6 +20,14 @@ export async function signupAction(formData: FormData): Promise<void> {
     throw new Error("Password must be at least 6 characters long");
   }
 
-  await createUser(username, password);
+  // Better Auth uses email field, but we'll use username as email
+  await auth.api.signUpEmail({
+    body: {
+      email: username,
+      password: password,
+      name: username,
+    },
+  });
+
   redirect("/login");
 }

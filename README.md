@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Features
 
-- **Authentication**: Secure user authentication using [NextAuth.js v5](https://authjs.dev/) with credentials provider
+- **Authentication**: Secure user authentication using [Better Auth](https://www.better-auth.com/) with email/password provider
 - **Database**: MongoDB for storing user credentials and application data
 - **UI**: Built with [Tailwind CSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/)
 

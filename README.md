@@ -2,8 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Features
 
-- **Authentication**: Secure user authentication using [NextAuth.js v5](https://authjs.dev/) with credentials provider
-- **Database**: MongoDB for storing user credentials and application data
+- **Authentication**: Secure user authentication using [Better Auth](https://www.better-auth.com/) with Discord OAuth2
+- **Database**: MongoDB for storing user data and application data
 - **UI**: Built with [Tailwind CSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/)
 
 ## Getting Started
@@ -23,13 +23,24 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 2. Update the environment variables in `.env.local`:
    - `MONGODB_URI`: Your MongoDB connection string
    - `AUTH_SECRET`: Generate a secret key using `openssl rand -base64 32`
+   - `DISCORD_CLIENT_ID`: Your Discord application client ID
+   - `DISCORD_CLIENT_SECRET`: Your Discord application client secret
+   - `NEXT_PUBLIC_APP_URL`: Your application URL (e.g., `http://localhost:3000` for development)
+
+### Setting up Discord OAuth2
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application or select an existing one
+3. Navigate to the OAuth2 section
+4. Add a redirect URL: `http://localhost:3000/api/auth/discord/callback` (for development)
+5. Copy your Client ID and Client Secret to `.env.local`
 
 ### Installation
 
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Running the Development Server
@@ -37,13 +48,7 @@ npm install
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -54,14 +59,12 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Authentication
 
-The application includes a complete authentication system:
+The application includes Discord OAuth2 authentication:
 
-- **Sign Up**: Create a new account at `/signup`
-- **Login**: Sign in at `/login` with your username and password
+- **Login**: Click "Login with Discord" in the navbar to authenticate
 - **Logout**: Click on your user avatar in the navbar to logout
-- **Protected Routes**: User sessions are managed with JWT tokens
-
-User passwords are securely hashed using bcrypt before being stored in the database.
+- **Protected Routes**: User sessions are managed with JWT tokens and the nextCookies plugin
+- **User Avatar**: Profile pictures are automatically fetched from Discord
 
 ## Learn More
 

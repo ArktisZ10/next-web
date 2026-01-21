@@ -20,18 +20,24 @@ export async function UserMenu() {
     );
   }
 
+  const avatarUrl = session.user.image; // wherever you read it from
+
+  const isAnimated =
+    typeof avatarUrl === "string" &&
+    (avatarUrl.endsWith(".gif") || avatarUrl.includes("/a_"));
+
   return (
     <div className="flex-none gap-2">
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            {session.user.image ? (
-              <Image 
-                src={session.user.image} 
-                alt={session.user.name || "User"} 
-                width={40} 
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt={session.user.name || "User"}
+                width={40}
                 height={40}
-                className="rounded-full"
+                unoptimized={isAnimated}
               />
             ) : (
               <div className="flex items-center justify-center h-full">

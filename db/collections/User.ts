@@ -1,48 +1,70 @@
-import { ObjectId } from "mongodb";
-import { getCollection } from "../client";
+import { prop, getModelForClass, modelOptions, ReturnModelType } from "@typegoose/typegoose";
+import { Types } from "mongoose";
+import { connectToDatabase } from "../client";
 import bcrypt from "bcryptjs";
 
-interface User {
-  username: string;
-  password: string;
-  createdAt?: Date;
+@modelOptions({ schemaOptions: { collection: "users", timestamps: false } })
+class User {
+    @prop({ required: true })
+    public username!: string;
+
+    @prop({ required: true })
+    public password!: string;
+
+    @prop({ default: () => new Date() })
+    public createdAt?: Date;
 }
 
-export interface UserDoc extends User {
-  _id: ObjectId;
+export interface UserDoc {
+    _id: Types.ObjectId;
+    username: string;
+    password: string;
+    createdAt?: Date;
+}
+
+const UserModel = getModelForClass(User);
+
+async function getUserModel(): Promise<ReturnModelType<typeof User>> {
+    await connectToDatabase();
+    return UserModel;
 }
 
 export async function userCollection() {
-  return await getCollection<UserDoc>("users");
+    return await getUserModel();
 }
 
 export async function getUserByUsername(username: string): Promise<UserDoc | null> {
-  const collection = await userCollection();
-  return await collection.findOne({ username });
+    const model = await getUserModel();
+    const user = await model.findOne({ username }).lean();
+    return user as UserDoc | null;
 }
 
 export async function createUser(username: string, password: string): Promise<UserDoc> {
-  const collection = await userCollection();
-  
-  // Check if user already exists
-  const existingUser = await getUserByUsername(username);
-  if (existingUser) {
-    throw new Error("User already exists");
-  }
+    const model = await getUserModel();
+    
+    // Check if user already exists
+    const existingUser = await getUserByUsername(username);
+    if (existingUser) {
+        throw new Error("User already exists");
+    }
 
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user: User = {
-    username,
-    password: hashedPassword,
-    createdAt: new Date(),
-  };
+    const user = await model.create({
+        username,
+        password: hashedPassword,
+        createdAt: new Date(),
+    });
 
-  const result = await collection.insertOne(user as UserDoc);
-  return { ...user, _id: result.insertedId } as UserDoc;
+    return {
+        _id: user._id,
+        username: user.username,
+        password: user.password,
+        createdAt: user.createdAt,
+    };
 }
 
 export async function verifyPassword(user: UserDoc, password: string): Promise<boolean> {
-  return await bcrypt.compare(password, user.password);
+    return bcrypt.compare(password, user.password);
 }

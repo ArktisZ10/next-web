@@ -1,25 +1,63 @@
-import { MongoClient } from "mongodb";
-import { attachDatabasePool } from "@vercel/functions";
-import { type Document } from "mongodb";
+import "reflect-metadata";
+import mongoose from "mongoose";
+import { MongoClient, Db } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
     throw new Error("Missing MONGODB_URI environment variable");
 }
 
-const client = new MongoClient(process.env.MONGODB_URI);
-attachDatabasePool(client);
+const MONGODB_URI = process.env.MONGODB_URI;
 
-export function getDb() {
+function getDbName() {
     const prefix = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
-    const dbName = `${prefix}_next_web`;
-    return client.db(dbName);
+    return `${prefix}_next_web`;
 }
 
-export async function getCollection<T extends Document>(name: string) {
-    const db = getDb();
-    return db.collection<T>(name);
+const dbName = getDbName();
+
+// Build the full connection URI with database name
+function getConnectionUri(): string {
+    const uri = new URL(MONGODB_URI);
+    uri.pathname = `/${dbName}`;
+    return uri.toString();
 }
 
-export function getMongoClient() {
-    return client;
+// ============================================================
+// Mongoose connection for Typegoose models
+// ============================================================
+
+// Cache the mongoose connection to avoid multiple connections in serverless environments
+let cachedConnection: typeof mongoose | null = null;
+
+export async function connectToDatabase(): Promise<typeof mongoose> {
+    if (cachedConnection) {
+        return cachedConnection;
+    }
+
+    const connectionUri = getConnectionUri();
+    
+    cachedConnection = await mongoose.connect(connectionUri);
+    
+    return cachedConnection;
+}
+
+// Get the mongoose connection
+export function getMongooseConnection() {
+    return mongoose.connection;
+}
+
+// ============================================================
+// Native MongoDB client for better-auth compatibility
+// ============================================================
+
+// Using native MongoClient for better-auth since it expects a synchronous Db object
+const nativeClient = new MongoClient(MONGODB_URI);
+
+// For backward compatibility with better-auth which uses mongodb adapter
+export function getDb(): Db {
+    return nativeClient.db(dbName);
+}
+
+export function getMongoClient(): MongoClient {
+    return nativeClient;
 }

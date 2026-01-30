@@ -12,14 +12,17 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@typegoose/typegoose": "^13.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/functions": "^3.3.5",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.4.16",
     "mongodb": "^7.0.0",
+    "mongoose": "^9.1.5",
     "next": "16.1.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

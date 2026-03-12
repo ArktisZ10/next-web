@@ -6,7 +6,8 @@ import {
   insertBoardgame,
   getBoardgames,
   updateBoardgame,
-  deleteBoardgame
+  deleteBoardgame,
+  fromFormData,
 } from './Boardgame';
 import { dbConnect } from '../mongoose';
 
@@ -86,5 +87,46 @@ describe('Boardgame Collection Structure', () => {
 
     games = await getBoardgames();
     expect(games).toHaveLength(0);
+  });
+});
+
+describe('fromFormData', () => {
+  it('parses all fields from FormData', () => {
+    const formData = new FormData();
+    formData.append('name', 'Chess');
+    formData.append('players_min', '2');
+    formData.append('players_max', '2');
+    formData.append('playtime_min', '30');
+    formData.append('playtime_max', '60');
+    formData.append('publisher', 'FIDE');
+    formData.append('year_published', '1886');
+
+    const result = fromFormData(formData);
+
+    expect(result.name).toBe('Chess');
+    expect(result.minPlayers).toBe(2);
+    expect(result.maxPlayers).toBe(2);
+    expect(result.minPlayTime).toBe(30);
+    expect(result.maxPlayTime).toBe(60);
+    expect(result.publisher).toBe('FIDE');
+    expect(result.yearPublished).toBe(1886);
+  });
+
+  it('parses only name when optional fields are absent', () => {
+    const formData = new FormData();
+    formData.append('name', 'Go');
+
+    const result = fromFormData(formData);
+
+    expect(result.name).toBe('Go');
+    expect(result.minPlayers).toBeUndefined();
+    expect(result.maxPlayers).toBeUndefined();
+    expect(result.publisher).toBeUndefined();
+    expect(result.yearPublished).toBeUndefined();
+  });
+
+  it('throws when name is missing', () => {
+    const formData = new FormData();
+    expect(() => fromFormData(formData)).toThrow('Name is required');
   });
 });

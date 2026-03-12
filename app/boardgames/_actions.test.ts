@@ -27,10 +27,11 @@ vi.mock('@/db/collections/Boardgame', () => ({
 }));
 
 describe('Boardgame Server Actions (Authentication check)', () => {
-  const mockFormData = new FormData();
-  mockFormData.append('id', '123');
+  let mockFormData: FormData;
 
   beforeEach(() => {
+    mockFormData = new FormData();
+    mockFormData.append('id', '123');
     vi.clearAllMocks();
   });
 

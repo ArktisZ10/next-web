@@ -6,6 +6,7 @@ describe('Home page', () => {
     const tree = JSON.stringify(Home());
 
     expect(tree).toContain('Hello there');
-    expect(tree).toContain('boardgames');
+    expect(tree).toContain('Welcome to my website');
+    expect(tree).toContain('ArktisZ10');
   });
 });

@@ -1,36 +1,57 @@
-import { ObjectId } from "mongodb";
-import { getCollection } from "../client";
+import { getModelForClass, prop } from "@typegoose/typegoose";
+import { dbConnect } from "../mongoose";
 
+export class Boardgame {
+  @prop({ required: true })
+  name!: string;
 
-interface Boardgame {
-  name: string
-  minPlayers?: number
-  maxPlayers?: number
-  minPlayTime?: number
-  maxPlayTime?: number
-  publisher?: string
-  yearPublished?: number
-  addedBy?: string
-  addedAt?: Date
-  updatedBy?: string
-  updatedAt?: Date
+  @prop()
+  minPlayers?: number;
+
+  @prop()
+  maxPlayers?: number;
+
+  @prop()
+  minPlayTime?: number;
+
+  @prop()
+  maxPlayTime?: number;
+
+  @prop()
+  publisher?: string;
+
+  @prop()
+  yearPublished?: number;
+
+  @prop()
+  addedBy?: string;
+
+  @prop()
+  addedAt?: Date;
+
+  @prop()
+  updatedBy?: string;
+
+  @prop()
+  updatedAt?: Date;
 }
 
-export interface BoardgameDoc extends Boardgame {
-  _id: ObjectId
-  id?: undefined
-}
+export const BoardgameModel = getModelForClass(Boardgame, {
+  schemaOptions: { collection: 'boardgame' }
+});
 
 export interface BoardgameEntity extends Boardgame {
-  _id?: undefined
-  id?: string
+  id: string;
 }
 
-function toBoardgameEntity(doc: BoardgameDoc): BoardgameEntity {
+import { DocumentType } from "@typegoose/typegoose";
+
+function toBoardgameEntity(doc: DocumentType<Boardgame>): BoardgameEntity {
+  const obj = doc.toJSON() as unknown as { _id: unknown } & Record<string, unknown>;
+  const { _id, ...rest } = obj;
   return {
-    ...doc,
-    id: doc._id.toString(),
-    _id: undefined,
+    ...(rest as unknown as Boardgame),
+    id: String(_id),
   };
 }
 
@@ -58,31 +79,23 @@ export function fromFormData(formData: FormData): Boardgame {
   };
 }
   
-export async function boardgameCollection() {
-  return await getCollection<BoardgameDoc>("boardgame");
-}
-
 export async function getBoardgames(): Promise<BoardgameEntity[]> {
-  const collection = await boardgameCollection();
-  const boardgames = await collection.find({}, { sort: { name: 1 } }).toArray();
+  await dbConnect();
+  const boardgames = await BoardgameModel.find().sort({ name: 1 });
   return boardgames.map(toBoardgameEntity);
 }
 
-export async function insertBoardgame(boardgame: Boardgame) {
-  const collection = await boardgameCollection();
-  const doc: Omit<BoardgameDoc, '_id'> = { ...boardgame, id: undefined };
-  return await collection.insertOne(doc as BoardgameDoc);
+export async function insertBoardgame(boardgame: Partial<Boardgame>) {
+  await dbConnect();
+  return await BoardgameModel.create(boardgame);
 }
 
 export async function updateBoardgame(id: string, updates: Partial<Boardgame>) {
-  const collection = await boardgameCollection();
-  return await collection.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: updates }
-  );
+  await dbConnect();
+  return await BoardgameModel.findByIdAndUpdate(id, updates, { returnDocument: 'after' });
 }
 
 export async function deleteBoardgame(id: string) {
-  const collection = await boardgameCollection();
-  return await collection.deleteOne({ _id: new ObjectId(id) });
+  await dbConnect();
+  return await BoardgameModel.findByIdAndDelete(id);
 }

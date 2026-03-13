@@ -2,13 +2,25 @@
   "name": "nextjs",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@typegoose/typegoose": "^13.2.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@vercel/functions": "^3.3.5",
+    "bcryptjs": "^3.0.3",
+    "better-auth": "^1.4.16",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.3.0",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -18,9 +30,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.0",
+    "daisyui": "^5.5.14",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "mongodb-memory-server": "^11.0.1",
+    "rimraf": "^6.1.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.0"
   }
 }

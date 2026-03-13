@@ -1,0 +1,6 @@
+ignoredBuiltDependencies:
+  - mongodb-memory-server
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - sharp

@@ -2,11 +2,11 @@
 
 import { signOut } from "@/lib/auth-client";
 
-export function LogoutButton() {
+export function LogoutButton({ className }: { className?: string }) {
   return (
     <button
       type="button"
-      className="w-full text-left"
+      className={className || "w-full text-left"}
       onClick={async () => {
         await signOut();
         // Hard reload guarantees server components (like the header UserMenu)

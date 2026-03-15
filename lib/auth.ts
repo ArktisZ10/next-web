@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { getDb } from "@/db/client";
 
@@ -25,7 +26,13 @@ export const auth = betterAuth({
       clientSecret: requiredEnv("DISCORD_CLIENT_SECRET"),
     },
   },
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: "read-only",
+      adminRole: "admin",
+    })
+  ],
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production",
   },

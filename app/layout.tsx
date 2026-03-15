@@ -5,6 +5,7 @@ import { Bars3Icon } from "@heroicons/react/16/solid";
 import Link from "next/link";
 import { UserMenu } from "./_components/UserMenu";
 import { DrawerLink } from "./_components/DrawerLink";
+import { AdminDrawerLink } from "./_components/AdminDrawerLink";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -88,6 +89,7 @@ export default function RootLayout({
                   Board Games
                 </DrawerLink>
               </li>
+              <AdminDrawerLink />
             </ul>
 
             <div className="p-4 border-t border-base-300 bg-base-200/50">

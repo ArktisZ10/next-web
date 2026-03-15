@@ -21,11 +21,11 @@ export default async function BoardGamesPage() {
         headers: await headers(),
     });
 
-    const isAuthenticated = !!session?.user;
+    const hasWriteAccess = session?.user?.role === 'admin' || session?.user?.role === 'write';
 
     return (
         <div className="p-8">
-            {isAuthenticated && <AddModalButton />}
+            {hasWriteAccess && <AddModalButton />}
             <table className="table table-xs table-pin-rows table-pin-cols">
                 <thead>
                     {TableHeader}
@@ -38,7 +38,7 @@ export default async function BoardGamesPage() {
                             <td>{game.minPlayTime && game.maxPlayTime ? `${game.minPlayTime} - ${game.maxPlayTime} min` : '-'}</td>
                             <td>{[game.publisher, game.yearPublished].filter(Boolean).join(", ")}</td>
                             <td className="flex justify-end space-x-2">
-                                {isAuthenticated && (
+                                {hasWriteAccess && (
                                     <>
                                         <EditModalButton editObject={game} />
                                         <RemoveButton id={game.id!} />

@@ -42,17 +42,17 @@ describe('Boardgame Server Actions (Authentication check)', () => {
     });
 
     it('addBoardgameAction should throw if not authenticated', async () => {
-      await expect(addBoardgameAction(mockFormData)).rejects.toThrow('User must be authenticated');
+      await expect(addBoardgameAction(mockFormData)).rejects.toThrow('User must have write access');
       expect(db.insertBoardgame).not.toHaveBeenCalled();
     });
 
     it('editBoardgameAction should throw if not authenticated', async () => {
-      await expect(editBoardgameAction('123', mockFormData)).rejects.toThrow('User must be authenticated');
+      await expect(editBoardgameAction('123', mockFormData)).rejects.toThrow('User must have write access');
       expect(db.updateBoardgame).not.toHaveBeenCalled();
     });
 
     it('removeBoardgame should throw if not authenticated', async () => {
-      await expect(removeBoardgame(mockFormData)).rejects.toThrow('User must be authenticated');
+      await expect(removeBoardgame(mockFormData)).rejects.toThrow('User must have write access');
       expect(db.deleteBoardgame).not.toHaveBeenCalled();
     });
   });
@@ -61,7 +61,7 @@ describe('Boardgame Server Actions (Authentication check)', () => {
     beforeEach(() => {
       // Return a dummy session
       vi.mocked(auth.api.getSession).mockResolvedValue({
-        user: { id: 'mock-user-1' },
+        user: { id: 'mock-user-1', role: 'admin' },
       } as any);
     });
 

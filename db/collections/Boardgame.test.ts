@@ -13,7 +13,7 @@ import { dbConnect } from '../mongoose';
 
 let mongoServer: MongoMemoryServer;
 
-describe('Boardgame Collection Structure', () => {
+describe('Given a connected MongoDB instance for boardgames', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     process.env.MONGODB_URI = mongoServer.getUri();
@@ -31,102 +31,137 @@ describe('Boardgame Collection Structure', () => {
     await BoardgameModel.deleteMany({});
   });
 
-  it('should insert a new boardgame', async () => {
-    const game = {
-      name: 'Settlers of Catan',
-      minPlayers: 3,
-      maxPlayers: 4,
-      publisher: 'Kosmos',
-    };
+  describe('When inserting a new boardgame', () => {
+    it('Then it creates the database record and returns the document with an _id', async () => {
+      // Given
+      const game = {
+        name: 'Settlers of Catan',
+        minPlayers: 3,
+        maxPlayers: 4,
+        publisher: 'Kosmos',
+      };
 
-    const inserted = await insertBoardgame(game);
-    
-    expect(inserted).toHaveProperty('_id');
-    expect(inserted.name).toBe('Settlers of Catan');
-    expect(inserted.minPlayers).toBe(3);
+      // When
+      const inserted = await insertBoardgame(game);
+      
+      // Then
+      expect(inserted).toHaveProperty('_id');
+      expect(inserted.name).toBe('Settlers of Catan');
+      expect(inserted.minPlayers).toBe(3);
+    });
   });
 
-  it('should get a list of formatted boardgames sorted by name', async () => {
-    await insertBoardgame({ name: 'Zombicide', minPlayers: 1, maxPlayers: 6 });
-    await insertBoardgame({ name: 'Catan', minPlayers: 3, maxPlayers: 4 });
-    await insertBoardgame({ name: 'Ticket to Ride', minPlayers: 2, maxPlayers: 5 });
-
-    const games = await getBoardgames();
-    
-    expect(games).toHaveLength(3);
-    expect(games[0].name).toBe('Catan');
-    expect(games[1].name).toBe('Ticket to Ride');
-    expect(games[2].name).toBe('Zombicide'); // Alphabetical sort check
-    
-    // Check type mapping to BoardgameEntity (no _id, has id)
-    expect(games[0]).not.toHaveProperty('_id');
-    expect(games[0]).toHaveProperty('id');
-    expect(typeof games[0].id).toBe('string');
+  describe('When retrieving the list of boardgames', () => {
+    it('Then it returns them sorted by name alphabetically and formats them as BoardgameEntity', async () => {
+      // Given
+      await insertBoardgame({ name: 'Zombicide', minPlayers: 1, maxPlayers: 6 });
+      await insertBoardgame({ name: 'Catan', minPlayers: 3, maxPlayers: 4 });
+      await insertBoardgame({ name: 'Ticket to Ride', minPlayers: 2, maxPlayers: 5 });
+      
+      // When
+      const games = await getBoardgames();
+      
+      // Then
+      expect(games).toHaveLength(3);
+      expect(games[0].name).toBe('Catan');
+      expect(games[1].name).toBe('Ticket to Ride');
+      expect(games[2].name).toBe('Zombicide'); // Alphabetical sort check
+      
+      // Check type mapping to BoardgameEntity (no _id, has id)
+      expect(games[0]).not.toHaveProperty('_id');
+      expect(games[0]).toHaveProperty('id');
+      expect(typeof games[0].id).toBe('string');
+    });
   });
 
-  it('should update an existing boardgame', async () => {
-    const inserted = await insertBoardgame({ name: 'Catan', minPlayers: 3 });
-    const id = inserted._id.toString();
+  describe('When updating an existing boardgame', () => {
+    it('Then it changes the targeted properties while retaining the old unmodified ones', async () => {
+      // Given
+      const inserted = await insertBoardgame({ name: 'Catan', minPlayers: 3 });
+      const id = inserted._id.toString();
 
-    const updated = await updateBoardgame(id, { name: 'Catan (Updated)', maxPlayers: 6 });
-    
-    expect(updated).not.toBeNull();
-    expect(updated?.name).toBe('Catan (Updated)');
-    expect(updated?.maxPlayers).toBe(6);
-    expect(updated?.minPlayers).toBe(3); // Should retain old properties
+      // When
+      const updated = await updateBoardgame(id, { name: 'Catan (Updated)', maxPlayers: 6 });
+      
+      // Then
+      expect(updated).not.toBeNull();
+      expect(updated?.name).toBe('Catan (Updated)');
+      expect(updated?.maxPlayers).toBe(6);
+      expect(updated?.minPlayers).toBe(3); // Should retain old properties
+    });
   });
 
-  it('should delete a boardgame', async () => {
-    const inserted = await insertBoardgame({ name: 'To Be Deleted' });
-    const id = inserted._id.toString();
+  describe('When deleting a boardgame', () => {
+    it('Then it completely removes the document from the collection', async () => {
+      // Given
+      const inserted = await insertBoardgame({ name: 'To Be Deleted' });
+      const id = inserted._id.toString();
 
-    let games = await getBoardgames();
-    expect(games).toHaveLength(1);
+      let games = await getBoardgames();
+      expect(games).toHaveLength(1);
 
-    await deleteBoardgame(id);
+      // When
+      await deleteBoardgame(id);
 
-    games = await getBoardgames();
-    expect(games).toHaveLength(0);
+      // Then
+      games = await getBoardgames();
+      expect(games).toHaveLength(0);
+    });
   });
 });
 
-describe('fromFormData', () => {
-  it('parses all fields from FormData', () => {
-    const formData = new FormData();
-    formData.append('name', 'Chess');
-    formData.append('players_min', '2');
-    formData.append('players_max', '2');
-    formData.append('playtime_min', '30');
-    formData.append('playtime_max', '60');
-    formData.append('publisher', 'FIDE');
-    formData.append('year_published', '1886');
+describe('Given form data representing a boardgame to be saved', () => {
+  describe('When processing the form containing all fields', () => {
+    it('Then it maps each field correctly to a BoardgameInput object', () => {
+      // Given
+      const formData = new FormData();
+      formData.append('name', 'Chess');
+      formData.append('players_min', '2');
+      formData.append('players_max', '2');
+      formData.append('playtime_min', '30');
+      formData.append('playtime_max', '60');
+      formData.append('publisher', 'FIDE');
+      formData.append('year_published', '1886');
 
-    const result = fromFormData(formData);
+      // When
+      const result = fromFormData(formData);
 
-    expect(result.name).toBe('Chess');
-    expect(result.minPlayers).toBe(2);
-    expect(result.maxPlayers).toBe(2);
-    expect(result.minPlayTime).toBe(30);
-    expect(result.maxPlayTime).toBe(60);
-    expect(result.publisher).toBe('FIDE');
-    expect(result.yearPublished).toBe(1886);
+      // Then
+      expect(result.name).toBe('Chess');
+      expect(result.minPlayers).toBe(2);
+      expect(result.maxPlayers).toBe(2);
+      expect(result.minPlayTime).toBe(30);
+      expect(result.maxPlayTime).toBe(60);
+      expect(result.publisher).toBe('FIDE');
+      expect(result.yearPublished).toBe(1886);
+    });
   });
 
-  it('parses only name when optional fields are absent', () => {
-    const formData = new FormData();
-    formData.append('name', 'Go');
+  describe('When processing form data without optional fields', () => {
+    it('Then it parses the name leaving other properties undefined', () => {
+      // Given
+      const formData = new FormData();
+      formData.append('name', 'Go');
 
-    const result = fromFormData(formData);
+      // When
+      const result = fromFormData(formData);
 
-    expect(result.name).toBe('Go');
-    expect(result.minPlayers).toBeUndefined();
-    expect(result.maxPlayers).toBeUndefined();
-    expect(result.publisher).toBeUndefined();
-    expect(result.yearPublished).toBeUndefined();
+      // Then
+      expect(result.name).toBe('Go');
+      expect(result.minPlayers).toBeUndefined();
+      expect(result.maxPlayers).toBeUndefined();
+      expect(result.publisher).toBeUndefined();
+      expect(result.yearPublished).toBeUndefined();
+    });
   });
 
-  it('throws when name is missing', () => {
-    const formData = new FormData();
-    expect(() => fromFormData(formData)).toThrow('Name is required');
+  describe('When processing form data without a name', () => {
+    it('Then it throws an error because name is required', () => {
+      // Given
+      const formData = new FormData();
+      
+      // When / Then
+      expect(() => fromFormData(formData)).toThrow('Name is required');
+    });
   });
 });

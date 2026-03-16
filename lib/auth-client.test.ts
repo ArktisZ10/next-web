@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const { mockCreateAuthClient } = vi.hoisted(() => ({
@@ -8,7 +9,7 @@ vi.mock('better-auth/react', () => ({
   createAuthClient: mockCreateAuthClient,
 }));
 
-describe('auth-client / getBaseURL', () => {
+describe('Given the getBaseURL logic in auth-client', () => {
   const savedEnv: Record<string, string | undefined> = {};
   const envKeys = ['NEXT_PUBLIC_APP_URL', 'VERCEL_URL', 'VERCEL_ENV'];
 
@@ -19,6 +20,9 @@ describe('auth-client / getBaseURL', () => {
       savedEnv[key] = process.env[key];
       delete process.env[key];
     }
+    // ensure window is not defined to trigger node environment block
+    // @ts-ignore
+    delete globalThis.window;
   });
 
   afterEach(() => {
@@ -31,47 +35,69 @@ describe('auth-client / getBaseURL', () => {
     }
   });
 
-  it('uses NEXT_PUBLIC_APP_URL when set', async () => {
-    process.env.NEXT_PUBLIC_APP_URL = 'https://my-app.example.com';
+  describe('When Server Side with NEXT_PUBLIC_APP_URL', () => {
+    it('Then it uses NEXT_PUBLIC_APP_URL', async () => {
+      // Given
+      process.env.NEXT_PUBLIC_APP_URL = 'https://my-app.example.com';
 
-    await import('@/lib/auth-client');
+      // When
+      await import('@/lib/auth-client');
 
-    expect(mockCreateAuthClient).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: 'https://my-app.example.com' }),
-    );
+      // Then
+      expect(mockCreateAuthClient).toHaveBeenCalledWith(
+        expect.objectContaining({ baseURL: 'https://my-app.example.com' }),
+      );
+    });
   });
 
-  it('uses VERCEL_URL with https scheme when NEXT_PUBLIC_APP_URL is absent', async () => {
-    process.env.VERCEL_URL = 'my-app.vercel.app';
+  describe('When Server Side without explicit URL but has VERCEL_URL', () => {
+    it('Then it uses VERCEL_URL with https scheme', async () => {
+      // Given
+      process.env.VERCEL_URL = 'my-app.vercel.app';
 
-    await import('@/lib/auth-client');
+      // When
+      await import('@/lib/auth-client');
 
-    expect(mockCreateAuthClient).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: 'https://my-app.vercel.app' }),
-    );
+      // Then
+      expect(mockCreateAuthClient).toHaveBeenCalledWith(
+        expect.objectContaining({ baseURL: 'https://my-app.vercel.app' }),
+      );
+    });
   });
 
-  it('falls back to localhost:3000 in local dev (no env vars set)', async () => {
-    await import('@/lib/auth-client');
+  describe('When Local dev environment without URL vars set', () => {
+    it('Then it falls back to localhost:3000', async () => {
+      // Given/When
+      await import('@/lib/auth-client');
 
-    expect(mockCreateAuthClient).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: 'http://localhost:3000' }),
-    );
+      // Then
+      expect(mockCreateAuthClient).toHaveBeenCalledWith(
+        expect.objectContaining({ baseURL: 'http://localhost:3000' }),
+      );
+    });
   });
 
-  it('throws when VERCEL_ENV is production and no URL is configured', async () => {
-    process.env.VERCEL_ENV = 'production';
+  describe('When production environment without URL configured', () => {
+    it('Then it throws an error to prevent localhost leak', async () => {
+      // Given
+      process.env.VERCEL_ENV = 'production';
 
-    await expect(import('@/lib/auth-client')).rejects.toThrow(
-      'Missing environment variable NEXT_PUBLIC_APP_URL',
-    );
+      // When/Then
+      await expect(import('@/lib/auth-client')).rejects.toThrow(
+        'Missing environment variable NEXT_PUBLIC_APP_URL',
+      );
+    });
   });
 
-  it('throws when VERCEL_ENV is development and no URL is configured', async () => {
-    process.env.VERCEL_ENV = 'development';
+  describe('When development environment on Vercel without URL configured', () => {
+    it('Then it throws an error to prevent localhost leak', async () => {
+      // Given
+      process.env.VERCEL_ENV = 'development';
 
-    await expect(import('@/lib/auth-client')).rejects.toThrow(
-      'Missing environment variable NEXT_PUBLIC_APP_URL',
-    );
+      // When/Then
+      await expect(import('@/lib/auth-client')).rejects.toThrow(
+        'Missing environment variable NEXT_PUBLIC_APP_URL',
+      );
+    });
   });
 });

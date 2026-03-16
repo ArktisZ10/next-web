@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { getDb } from "@/db/client";
 
@@ -18,6 +19,24 @@ export const auth = betterAuth({
 	// Avoid requiring replica-set transactions by default.
 	transaction: false,
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
+          
+          if (adminEmails.includes(user.email)) {
+             return {
+               data: {
+                 ...user,
+                 role: "admin"
+               }
+             }
+          }
+        }
+      }
+    }
+  },
   secret: requiredEnv("AUTH_SECRET"),
   socialProviders: {
     discord: {
@@ -25,7 +44,13 @@ export const auth = betterAuth({
       clientSecret: requiredEnv("DISCORD_CLIENT_SECRET"),
     },
   },
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: "read-only",
+      adminRole: "admin",
+    })
+  ],
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production",
   },

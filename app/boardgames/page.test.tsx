@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import BoardGamesPage from './page';
 import { auth } from '@/lib/auth';
 import * as db from '@/db/collections/Boardgame';
@@ -15,46 +16,49 @@ vi.mock('next/headers', () => ({
   headers: vi.fn(() => new Headers())
 }));
 
-vi.mock('./_components/AddModalButton', () => ({ default: 'MockAddModalButton' }));
-vi.mock('./_components/EditModalButton', () => ({ default: 'MockEditModalButton' }));
-vi.mock('./_components/DeleteButton', () => ({ default: 'MockDeleteButton' }));
-
 vi.mock('@/db/collections/Boardgame', () => ({
   getBoardgames: vi.fn()
 }));
 
-describe('BoardGamesPage Authentication Rendering', () => {
+describe('Given the BoardGames Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(db.getBoardgames).mockResolvedValue([
-      { id: '1', name: 'Test Game' } as any
+      { id: '1', name: 'Test Game', minPlayers: 2, maxPlayers: 4 } as any,
+      { id: '2', name: 'Another Game', minPlayTime: 30, maxPlayTime: 60 } as any
     ]);
   });
 
-  it('hides edit/delete/add controls when unauthenticated', async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(null);
+  const testCases = [
+    { role: null, canEdit: false },
+    { role: undefined, canEdit: false },
+    { role: 'read-only', canEdit: false },
+    { role: 'write', canEdit: true },
+    { role: 'admin', canEdit: true },
+  ];
 
-    const page = await BoardGamesPage();
-    // We stringify the react node tree to check for presence of mocked components
-    const treeString = JSON.stringify(page);
+  describe.each(testCases)('When accessed by a user with role: $role', ({ role, canEdit }) => {
+    it(`Then it ${canEdit ? 'shows' : 'hides'} the edit/delete/add controls appropriately`, async () => {
+      // Given
+      vi.mocked(auth.api.getSession).mockResolvedValue(
+        role === null 
+          ? null 
+          : { user: { id: 'mock-user-1', role } } as any
+      );
 
-    expect(treeString).toContain('Test Game'); // Ensure game renders
-    expect(treeString).not.toContain('MockAddModalButton'); // Add button should be hidden
-    expect(treeString).not.toContain('MockEditModalButton'); // Edit button should be hidden
-    expect(treeString).not.toContain('MockDeleteButton'); // Delete button should be hidden
-  });
+      // When
+      const ResolvedPage = await BoardGamesPage();
+      render(ResolvedPage);
 
-  it('shows edit/delete/add controls when authenticated', async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue({
-      user: { id: 'mock-user-1' },
-    } as any);
+      // Then
+      expect(screen.getAllByText('Test Game')[0]).toBeInTheDocument();
 
-    const page = await BoardGamesPage();
-    const treeString = JSON.stringify(page);
-
-    expect(treeString).toContain('Test Game'); // Ensure game renders
-    expect(treeString).toContain('MockAddModalButton'); // Add button should be visible
-    expect(treeString).toContain('MockEditModalButton'); // Edit button should be visible
-    expect(treeString).toContain('MockDeleteButton'); // Delete button should be visible
+      if (canEdit) {
+        expect(screen.getAllByText('Add new boardgame')[0]).toBeInTheDocument();
+        expect(screen.getAllByText('New Boardgame')[0]).toBeInTheDocument(); // The Upsert Modal hidden title
+      } else {
+        expect(screen.queryByText('Add new boardgame')).not.toBeInTheDocument();
+      }
+    });
   });
 });

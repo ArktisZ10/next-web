@@ -10,8 +10,8 @@ export async function addBoardgameAction(formData: FormData) {
         headers: await headers(),
     });
     
-    if (!session?.user?.id) {
-        throw new Error('User must be authenticated');
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
+        throw new Error('User must have write access');
     }
 
     const boardgame = fromFormData(formData);
@@ -29,8 +29,8 @@ export async function editBoardgameAction(id: string, formData: FormData) {
         headers: await headers(),
     });
     
-    if (!session?.user?.id) {
-        throw new Error('User must be authenticated');
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
+        throw new Error('User must have write access');
     }
 
     const boardgame = fromFormData(formData);
@@ -48,8 +48,8 @@ export async function removeBoardgame(formData: FormData) {
         headers: await headers(),
     });
     
-    if (!session?.user?.id) {
-        throw new Error('User must be authenticated');
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
+        throw new Error('User must have write access');
     }
 
     const id = formData.get('id')?.toString();

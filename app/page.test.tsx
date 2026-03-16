@@ -1,12 +1,17 @@
 import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import Home from './page';
 
-describe('Home page', () => {
-  it('renders landing page content', () => {
-    const tree = JSON.stringify(Home());
+describe('Given the Home page component', () => {
+  describe('When it is rendered', () => {
+    it('Then it displays the landing page content', () => {
+      // Given/When
+      render(Home());
 
-    expect(tree).toContain('Hello there');
-    expect(tree).toContain('Welcome to my website');
-    expect(tree).toContain('ArktisZ10');
+      // Then
+      expect(screen.getByText('Hello there!')).toBeInTheDocument();
+      expect(screen.getByText(/Welcome to my website/)).toBeInTheDocument();
+      expect(screen.getByText('ArktisZ10')).toBeInTheDocument();
+    });
   });
 });

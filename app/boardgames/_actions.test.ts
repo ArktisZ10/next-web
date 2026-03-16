@@ -26,7 +26,7 @@ vi.mock('@/db/collections/Boardgame', () => ({
   fromFormData: vi.fn(() => ({ name: 'Mocked Game' }))
 }));
 
-describe('Boardgame Server Actions (Authentication check)', () => {
+describe('Given the Boardgame Server Actions', () => {
   let mockFormData: FormData;
 
   beforeEach(() => {
@@ -35,53 +35,86 @@ describe('Boardgame Server Actions (Authentication check)', () => {
     vi.clearAllMocks();
   });
 
-  describe('Unauthenticated interactions', () => {
+  const testCases = [
+    { role: null, canEdit: false },
+    { role: undefined, canEdit: false },
+    { role: 'read-only', canEdit: false },
+    { role: 'write', canEdit: true },
+    { role: 'admin', canEdit: true },
+  ];
+
+  describe.each(testCases)('When a user with role \'$role\' performs actions', ({ role, canEdit }) => {
     beforeEach(() => {
-      // Return null to simulate no user session
-      vi.mocked(auth.api.getSession).mockResolvedValue(null);
+      vi.mocked(auth.api.getSession).mockResolvedValue(
+        role === null 
+          ? null 
+          : { user: { id: 'mock-user-1', role } } as any
+      );
     });
 
-    it('addBoardgameAction should throw if not authenticated', async () => {
-      await expect(addBoardgameAction(mockFormData)).rejects.toThrow('User must be authenticated');
-      expect(db.insertBoardgame).not.toHaveBeenCalled();
-    });
+    if (!canEdit) {
+      it('Then addBoardgameAction throws an error indicating lack of write access', async () => {
+        // Given/When
+        const addPromise = addBoardgameAction(mockFormData);
+        // Then
+        await expect(addPromise).rejects.toThrow('User must have write access');
+        expect(db.insertBoardgame).not.toHaveBeenCalled();
+      });
 
-    it('editBoardgameAction should throw if not authenticated', async () => {
-      await expect(editBoardgameAction('123', mockFormData)).rejects.toThrow('User must be authenticated');
-      expect(db.updateBoardgame).not.toHaveBeenCalled();
-    });
+      it('Then editBoardgameAction throws an error indicating lack of write access', async () => {
+        // Given/When
+        const editPromise = editBoardgameAction('123', mockFormData);
+        // Then
+        await expect(editPromise).rejects.toThrow('User must have write access');
+        expect(db.updateBoardgame).not.toHaveBeenCalled();
+      });
 
-    it('removeBoardgame should throw if not authenticated', async () => {
-      await expect(removeBoardgame(mockFormData)).rejects.toThrow('User must be authenticated');
-      expect(db.deleteBoardgame).not.toHaveBeenCalled();
-    });
+      it('Then removeBoardgame throws an error indicating lack of write access', async () => {
+        // Given/When
+        const removePromise = removeBoardgame(mockFormData);
+        // Then
+        await expect(removePromise).rejects.toThrow('User must have write access');
+        expect(db.deleteBoardgame).not.toHaveBeenCalled();
+      });
+    } else {
+      it('Then addBoardgameAction successfully processes and inserts the boardgame', async () => {
+        // Given/When
+        await addBoardgameAction(mockFormData);
+        // Then
+        expect(db.insertBoardgame).toHaveBeenCalledWith(
+          expect.objectContaining({ addedBy: 'mock-user-1' })
+        );
+      });
+
+      it('Then editBoardgameAction successfully processes and updates the boardgame', async () => {
+        // Given/When
+        await editBoardgameAction('123', mockFormData);
+        // Then
+        expect(db.updateBoardgame).toHaveBeenCalledWith('123',
+          expect.objectContaining({ updatedBy: 'mock-user-1' })
+        );
+      });
+
+      it('Then removeBoardgame successfully deletes the boardgame', async () => {
+        // Given/When
+        await removeBoardgame(mockFormData);
+        // Then
+        expect(db.deleteBoardgame).toHaveBeenCalledWith('123');
+      });
+    }
   });
 
-  describe('Authenticated interactions', () => {
-    beforeEach(() => {
-      // Return a dummy session
-      vi.mocked(auth.api.getSession).mockResolvedValue({
-        user: { id: 'mock-user-1' },
-      } as any);
-    });
-
-    it('addBoardgameAction should process and insert as authenticated user', async () => {
-      await addBoardgameAction(mockFormData);
-      expect(db.insertBoardgame).toHaveBeenCalledWith(
-        expect.objectContaining({ addedBy: 'mock-user-1' })
-      );
-    });
-
-    it('editBoardgameAction should process and update as authenticated user', async () => {
-      await editBoardgameAction('123', mockFormData);
-      expect(db.updateBoardgame).toHaveBeenCalledWith('123',
-        expect.objectContaining({ updatedBy: 'mock-user-1' })
-      );
-    });
-
-    it('removeBoardgame should delete when authenticated', async () => {
-      await removeBoardgame(mockFormData);
-      expect(db.deleteBoardgame).toHaveBeenCalledWith('123');
+  describe('When an admin attempts to remove a boardgame without providing an ID', () => {
+    it('Then it throws a missing ID error', async () => {
+      // Given
+      vi.mocked(auth.api.getSession).mockResolvedValue({ user: { id: 'mock-user', role: 'admin' } } as any);
+      const emptyFormData = new FormData();
+      
+      // When
+      const removePromise = removeBoardgame(emptyFormData);
+      
+      // Then
+      await expect(removePromise).rejects.toThrow('ID is required');
     });
   });
 });

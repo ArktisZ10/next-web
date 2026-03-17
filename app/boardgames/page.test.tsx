@@ -24,7 +24,7 @@ describe('Given the BoardGames Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(db.getBoardgames).mockResolvedValue([
-      { id: '1', name: 'Test Game', minPlayers: 2, maxPlayers: 4 } as any,
+      { id: '1', name: 'Test Game', minPlayers: 2, maxPlayers: 4, image: 'https://example.com/test.jpg' } as any,
       { id: '2', name: 'Another Game', minPlayTime: 30, maxPlayTime: 60 } as any
     ]);
   });

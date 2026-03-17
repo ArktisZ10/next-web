@@ -23,6 +23,9 @@ export default function UpsertModal({editObject, action, dialogRef}: UpsertModal
                     <label className="label">Title</label>
                     <input type="text" name="name" className="input" placeholder="Awesome game" defaultValue={editObject?.name} />
 
+                    <label className="label">Image URL</label>
+                    <input type="text" name="image" className="input" placeholder="https://example.com/image.jpg" defaultValue={editObject?.image} />
+
                     <label className="label">Players</label>
                     <div className="flex space-x-4">
                         <input type="number" name="players_min" className="input" placeholder="Min" defaultValue={editObject?.minPlayers} />

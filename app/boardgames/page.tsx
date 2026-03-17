@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 export const revalidate = 600;
 
 const TableHeader = <tr>
+    <td>Image</td>
     <td>Name</td>
     <td>Players</td>
     <td>Play Time</td>
@@ -33,6 +34,7 @@ export default async function BoardGamesPage() {
                 <tbody>
                     {boardgames.map((game, index) => (
                         <tr key={index} className="text-lg">
+                            <td>{game.image && <img src={game.image} alt={game.name} className="w-16 h-16 object-cover rounded shadow" />}</td>
                             <td>{game.name}</td>
                             <td>{game.minPlayers && game.maxPlayers ? `${game.minPlayers} - ${game.maxPlayers}` : '-'}</td>
                             <td>{game.minPlayTime && game.maxPlayTime ? `${game.minPlayTime} - ${game.maxPlayTime} min` : '-'}</td>

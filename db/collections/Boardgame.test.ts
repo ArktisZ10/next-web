@@ -39,6 +39,7 @@ describe('Given a connected MongoDB instance for boardgames', () => {
         minPlayers: 3,
         maxPlayers: 4,
         publisher: 'Kosmos',
+        image: 'https://example.com/catan.jpg',
       };
 
       // When
@@ -48,6 +49,7 @@ describe('Given a connected MongoDB instance for boardgames', () => {
       expect(inserted).toHaveProperty('_id');
       expect(inserted.name).toBe('Settlers of Catan');
       expect(inserted.minPlayers).toBe(3);
+      expect(inserted.image).toBe('https://example.com/catan.jpg');
     });
   });
 
@@ -116,6 +118,7 @@ describe('Given form data representing a boardgame to be saved', () => {
       // Given
       const formData = new FormData();
       formData.append('name', 'Chess');
+      formData.append('image', 'https://example.com/chess.jpg');
       formData.append('players_min', '2');
       formData.append('players_max', '2');
       formData.append('playtime_min', '30');
@@ -128,6 +131,7 @@ describe('Given form data representing a boardgame to be saved', () => {
 
       // Then
       expect(result.name).toBe('Chess');
+      expect(result.image).toBe('https://example.com/chess.jpg');
       expect(result.minPlayers).toBe(2);
       expect(result.maxPlayers).toBe(2);
       expect(result.minPlayTime).toBe(30);
@@ -148,6 +152,7 @@ describe('Given form data representing a boardgame to be saved', () => {
 
       // Then
       expect(result.name).toBe('Go');
+      expect(result.image).toBeUndefined();
       expect(result.minPlayers).toBeUndefined();
       expect(result.maxPlayers).toBeUndefined();
       expect(result.publisher).toBeUndefined();

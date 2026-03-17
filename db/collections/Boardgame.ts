@@ -6,6 +6,9 @@ export class Boardgame {
   name!: string;
 
   @prop()
+  image?: string;
+
+  @prop()
   minPlayers?: number;
 
   @prop()
@@ -57,6 +60,7 @@ function toBoardgameEntity(doc: DocumentType<Boardgame>): BoardgameEntity {
 
 export function fromFormData(formData: FormData): Boardgame {
   const name = formData.get('name')?.toString() || '';
+  const image = formData.get('image')?.toString() || undefined;
   const minPlayers = formData.get('players_min') ? parseInt(formData.get('players_min')!.toString(), 10) : undefined;
   const maxPlayers = formData.get('players_max') ? parseInt(formData.get('players_max')!.toString(), 10) : undefined;
   const minPlayTime = formData.get('playtime_min') ? parseInt(formData.get('playtime_min')!.toString(), 10) : undefined;
@@ -70,6 +74,7 @@ export function fromFormData(formData: FormData): Boardgame {
 
   return {
     name,
+    image,
     minPlayers,
     maxPlayers,
     minPlayTime,

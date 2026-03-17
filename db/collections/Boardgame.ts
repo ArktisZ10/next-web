@@ -1,4 +1,5 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
+import mongoose from "mongoose";
 import { dbConnect } from "../mongoose";
 
 export class Boardgame {
@@ -39,7 +40,7 @@ export class Boardgame {
   updatedAt?: Date;
 }
 
-export const BoardgameModel = getModelForClass(Boardgame, {
+export const BoardgameModel = mongoose.models.Boardgame || getModelForClass(Boardgame, {
   schemaOptions: { collection: 'boardgame' }
 });
 
@@ -84,9 +85,38 @@ export function fromFormData(formData: FormData): Boardgame {
   };
 }
   
-export async function getBoardgames(): Promise<BoardgameEntity[]> {
+export interface BoardgameFilter {
+  search?: string;
+  players?: number;
+  playtime?: number;
+}
+
+export async function getBoardgames(filter?: BoardgameFilter): Promise<BoardgameEntity[]> {
   await dbConnect();
-  const boardgames = await BoardgameModel.find().sort({ name: 1 });
+  
+  const query: any = {};
+  
+  if (filter?.search) {
+    query.name = { $regex: filter.search, $options: 'i' };
+  }
+
+  if (filter?.players !== undefined) {
+    query.$and = query.$and || [];
+    query.$and.push(
+      { $or: [{ minPlayers: { $lte: filter.players } }, { minPlayers: null }, { minPlayers: { $exists: false } }] },
+      { $or: [{ maxPlayers: { $gte: filter.players } }, { maxPlayers: null }, { maxPlayers: { $exists: false } }] }
+    );
+  }
+
+  if (filter?.playtime !== undefined) {
+    query.$and = query.$and || [];
+    query.$and.push(
+      { $or: [{ minPlayTime: { $lte: filter.playtime } }, { minPlayTime: null }, { minPlayTime: { $exists: false } }] },
+      { $or: [{ maxPlayTime: { $gte: filter.playtime } }, { maxPlayTime: null }, { maxPlayTime: { $exists: false } }] }
+    );
+  }
+  
+  const boardgames = await BoardgameModel.find(query).sort({ name: 1 });
   return boardgames.map(toBoardgameEntity);
 }
 

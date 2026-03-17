@@ -53,6 +53,33 @@ describe('Given a connected MongoDB instance for boardgames', () => {
     });
   });
 
+  describe('When retrieving the list of boardgames with filters', () => {
+    it('Then it filters correctly by search, players, and playtime', async () => {
+      // Given
+      await insertBoardgame({ name: 'Zombicide', minPlayers: 1, maxPlayers: 6, minPlayTime: 60, maxPlayTime: 120 });
+      await insertBoardgame({ name: 'Catan', minPlayers: 3, maxPlayers: 4, minPlayTime: 60, maxPlayTime: 120 });
+      await insertBoardgame({ name: 'Ticket to Ride', minPlayers: 2, maxPlayers: 5, minPlayTime: 30, maxPlayTime: 60 });
+      await insertBoardgame({ name: 'Chess', minPlayers: 2, maxPlayers: 2, minPlayTime: 5, maxPlayTime: 30 });
+      await insertBoardgame({ name: 'Mystic', minPlayers: null as any, maxPlayers: null as any, maxPlayTime: null as any }); // Testing nulls
+
+      // When
+      const searchGames = await getBoardgames({ search: 'cat' });
+      const playerGames = await getBoardgames({ players: 5 });
+      const playtimeGames = await getBoardgames({ playtime: 60 });
+
+      // Then
+      expect(searchGames).toHaveLength(1); // Catan
+      expect(searchGames.map(g => g.name)).toContain('Catan');
+      
+      expect(playerGames).toHaveLength(3); // Zombicide, Ticket to Ride, Mystic(nulls)
+      expect(playerGames.map(g => g.name)).not.toContain('Catan');
+      expect(playerGames.map(g => g.name)).not.toContain('Chess');
+
+      expect(playtimeGames).toHaveLength(4); // Zombicide, Catan, Ticket to Ride, Mystic(nulls)
+      expect(playtimeGames.map(g => g.name)).not.toContain('Chess'); 
+    });
+  });
+
   describe('When retrieving the list of boardgames', () => {
     it('Then it returns them sorted by name alphabetically and formats them as BoardgameEntity', async () => {
       // Given

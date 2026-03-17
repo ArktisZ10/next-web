@@ -3,7 +3,7 @@
 import { insertBoardgame, updateBoardgame, deleteBoardgame, fromFormData } from "@/db/collections/Boardgame";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 
 export async function addBoardgameAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -58,5 +58,11 @@ export async function removeBoardgame(formData: FormData) {
     }
 
     await deleteBoardgame(id);
+    revalidatePath('/boardgames');
+}
+
+export async function setViewAction(view: 'table' | 'grid') {
+    const cookieStore = await cookies();
+    cookieStore.set('boardgameView', view, { maxAge: 60 * 60 * 24 * 365 }); // 1 year
     revalidatePath('/boardgames');
 }

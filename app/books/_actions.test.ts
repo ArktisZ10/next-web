@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { addBoardgameAction, editBoardgameAction, removeBoardgame } from './_actions';
+import { addBookAction, editBookAction, removeBook } from './_actions';
 import { auth } from '@/lib/auth';
-import * as db from '@/db/collections/Boardgame';
+import * as db from '@/db/collections/Book';
 
 vi.mock('@/lib/auth', () => ({
   auth: {
@@ -22,14 +22,14 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn()
 }));
 
-vi.mock('@/db/collections/Boardgame', () => ({
-  insertBoardgame: vi.fn(),
-  updateBoardgame: vi.fn(),
-  deleteBoardgame: vi.fn(),
-  fromFormData: vi.fn(() => ({ name: 'Mocked Game' }))
+vi.mock('@/db/collections/Book', () => ({
+  insertBook: vi.fn(),
+  updateBook: vi.fn(),
+  deleteBook: vi.fn(),
+  fromFormData: vi.fn(() => ({ name: 'Mocked Book' }))
 }));
 
-describe('Given the Boardgame Server Actions', () => {
+describe('Given the Book Server Actions', () => {
   let mockFormData: FormData;
 
   beforeEach(() => {
@@ -56,65 +56,65 @@ describe('Given the Boardgame Server Actions', () => {
     });
 
     if (!canEdit) {
-      it('Then addBoardgameAction throws an error indicating lack of write access', async () => {
+      it('Then addBookAction throws an error indicating lack of write access', async () => {
         // Given/When
-        const addPromise = addBoardgameAction(mockFormData);
+        const addPromise = addBookAction(mockFormData);
         // Then
         await expect(addPromise).rejects.toThrow('User must have write access');
-        expect(db.insertBoardgame).not.toHaveBeenCalled();
+        expect(db.insertBook).not.toHaveBeenCalled();
       });
 
-      it('Then editBoardgameAction throws an error indicating lack of write access', async () => {
+      it('Then editBookAction throws an error indicating lack of write access', async () => {
         // Given/When
-        const editPromise = editBoardgameAction('123', mockFormData);
+        const editPromise = editBookAction('123', mockFormData);
         // Then
         await expect(editPromise).rejects.toThrow('User must have write access');
-        expect(db.updateBoardgame).not.toHaveBeenCalled();
+        expect(db.updateBook).not.toHaveBeenCalled();
       });
 
-      it('Then removeBoardgame throws an error indicating lack of write access', async () => {
+      it('Then removeBook throws an error indicating lack of write access', async () => {
         // Given/When
-        const removePromise = removeBoardgame(mockFormData);
+        const removePromise = removeBook(mockFormData);
         // Then
         await expect(removePromise).rejects.toThrow('User must have write access');
-        expect(db.deleteBoardgame).not.toHaveBeenCalled();
+        expect(db.deleteBook).not.toHaveBeenCalled();
       });
     } else {
-      it('Then addBoardgameAction successfully processes and inserts the boardgame', async () => {
+      it('Then addBookAction successfully processes and inserts the book', async () => {
         // Given/When
-        await addBoardgameAction(mockFormData);
+        await addBookAction(mockFormData);
         // Then
-        expect(db.insertBoardgame).toHaveBeenCalledWith(
+        expect(db.insertBook).toHaveBeenCalledWith(
           expect.objectContaining({ addedBy: 'mock-user-1' })
         );
       });
 
-      it('Then editBoardgameAction successfully processes and updates the boardgame', async () => {
+      it('Then editBookAction successfully processes and updates the book', async () => {
         // Given/When
-        await editBoardgameAction('123', mockFormData);
+        await editBookAction('123', mockFormData);
         // Then
-        expect(db.updateBoardgame).toHaveBeenCalledWith('123',
+        expect(db.updateBook).toHaveBeenCalledWith('123',
           expect.objectContaining({ updatedBy: 'mock-user-1' })
         );
       });
 
-      it('Then removeBoardgame successfully deletes the boardgame', async () => {
+      it('Then removeBook successfully deletes the book', async () => {
         // Given/When
-        await removeBoardgame(mockFormData);
+        await removeBook(mockFormData);
         // Then
-        expect(db.deleteBoardgame).toHaveBeenCalledWith('123');
+        expect(db.deleteBook).toHaveBeenCalledWith('123');
       });
     }
   });
 
-  describe('When an admin attempts to remove a boardgame without providing an ID', () => {
+  describe('When an admin attempts to remove a book without providing an ID', () => {
     it('Then it throws a missing ID error', async () => {
       // Given
       vi.mocked(auth.api.getSession).mockResolvedValue({ user: { id: 'mock-user', role: 'admin' } } as any);
       const emptyFormData = new FormData();
       
       // When
-      const removePromise = removeBoardgame(emptyFormData);
+      const removePromise = removeBook(emptyFormData);
       
       // Then
       await expect(removePromise).rejects.toThrow('ID is required');

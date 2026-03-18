@@ -1,17 +1,26 @@
 'use client';
 
 import { useTransition } from 'react';
-import { setViewAction } from '../_actions';
+import { useRouter } from 'next/navigation';
+import { setViewCookie } from '../_actions';
 
-export default function ViewToggle({ currentView }: { currentView: string }) {
+export default function ViewToggle({ currentView, cookieName }: { currentView: string; cookieName: string }) {
     const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+
+    const handleToggle = (view: 'table' | 'grid') => {
+        startTransition(async () => {
+            await setViewCookie(cookieName, view);
+            router.refresh();
+        });
+    };
 
     return (
         <div className="join">
             <button 
                 disabled={isPending}
                 className={`join-item btn btn-sm px-2 ${currentView === 'table' ? 'btn-active' : ''}`}
-                onClick={() => startTransition(() => setViewAction('table'))}
+                onClick={() => handleToggle('table')}
                 title="Table View"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -21,7 +30,7 @@ export default function ViewToggle({ currentView }: { currentView: string }) {
             <button 
                 disabled={isPending}
                 className={`join-item btn btn-sm px-2 ${currentView === 'grid' ? 'btn-active' : ''}`}
-                onClick={() => startTransition(() => setViewAction('grid'))}
+                onClick={() => handleToggle('grid')}
                 title="Grid View"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">

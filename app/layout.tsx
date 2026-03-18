@@ -83,6 +83,7 @@ export default function RootLayout({
                   Home
                 </DrawerLink>
               </li>
+              <li className="menu-title mt-2">Collections</li>
               <li>
                 <DrawerLink href="/boardgames">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -90,6 +91,22 @@ export default function RootLayout({
                     <path d="M8 8h.01"/><path d="M16 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/>
                   </svg>
                   Board Games
+                </DrawerLink>
+              </li>
+              <li>
+                <DrawerLink href="/books">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                  </svg>
+                  Books
+                </DrawerLink>
+              </li>
+              <li>
+                <DrawerLink href="/lego">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 2v6h4V2z"/><path d="M21 8v14H3V8z"/><path d="M10 22h4"/><path d="M7 8v2"/><path d="M17 8v2"/>
+                  </svg>
+                  Lego
                 </DrawerLink>
               </li>
               <AdminDrawerLink />

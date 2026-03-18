@@ -1,11 +1,11 @@
 'use server';
 
-import { insertBoardgame, updateBoardgame, deleteBoardgame, fromFormData } from "@/db/collections/Boardgame";
+import { insertBook, updateBook, deleteBook, fromFormData } from "@/db/collections/Book";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-import { headers, cookies } from "next/headers";
+import { headers } from "next/headers";
 
-export async function addBoardgameAction(formData: FormData) {
+export async function addBookAction(formData: FormData) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -14,17 +14,17 @@ export async function addBoardgameAction(formData: FormData) {
         throw new Error('User must have write access');
     }
 
-    const boardgame = fromFormData(formData);
+    const item = fromFormData(formData);
 
-    await insertBoardgame({
-        ...boardgame,
+    await insertBook({
+        ...item,
         addedBy: session.user.id,
         addedAt: new Date(),
     });
-    revalidatePath('/boardgames');
+    revalidatePath('/books');
 }
 
-export async function editBoardgameAction(id: string, formData: FormData) {
+export async function editBookAction(id: string, formData: FormData) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -33,17 +33,17 @@ export async function editBoardgameAction(id: string, formData: FormData) {
         throw new Error('User must have write access');
     }
 
-    const boardgame = fromFormData(formData);
+    const item = fromFormData(formData);
 
-    await updateBoardgame(id, {
-        ...boardgame,
+    await updateBook(id, {
+        ...item,
         updatedBy: session.user.id,
         updatedAt: new Date(),
     });
-    revalidatePath('/boardgames');
+    revalidatePath('/books');
 }
 
-export async function removeBoardgame(formData: FormData) {
+export async function removeBook(formData: FormData) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -57,6 +57,6 @@ export async function removeBoardgame(formData: FormData) {
         throw new Error('ID is required');
     }
 
-    await deleteBoardgame(id);
-    revalidatePath('/boardgames');
+    await deleteBook(id);
+    revalidatePath('/books');
 }

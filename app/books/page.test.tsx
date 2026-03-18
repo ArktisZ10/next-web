@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import BoardGamesPage from './page';
+import BooksPage from './page';
 import { auth } from '@/lib/auth';
-import * as db from '@/db/collections/Boardgame';
+import * as db from '@/db/collections/Book';
 
 vi.mock('@/lib/auth', () => ({
   auth: {
@@ -22,17 +22,17 @@ vi.mock('next/navigation', () => ({
   useSearchParams: vi.fn(() => new URLSearchParams())
 }));
 
-vi.mock('@/db/collections/Boardgame', () => ({
-  getBoardgames: vi.fn()
+vi.mock('@/db/collections/Book', () => ({
+  getBooks: vi.fn()
 }));
 
-describe('Given the BoardGames Page', () => {
+describe('Given the Books Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(db.getBoardgames).mockResolvedValue([
-      { id: '1', name: 'Test Game', minPlayers: 2, maxPlayers: 4, image: 'https://example.com/test.jpg', publisher: 'Test Pub', yearPublished: 2020 } as any,
-      { id: '2', name: 'Another Game', minPlayTime: 30, maxPlayTime: 60 } as any,
-      { id: '3', name: 'Same Number Game', minPlayers: 4, maxPlayers: 4, minPlayTime: 45, maxPlayTime: 45 } as any
+    vi.mocked(db.getBooks).mockResolvedValue([
+      { id: '1', title: 'Test Book', author: 'Test Author', image: 'https://example.com/test.jpg', publisher: 'Test Pub', yearPublished: 2020 } as any,
+      { id: '2', title: 'Another Book', pages: 300, isbn: '1234567890' } as any,
+      { id: '3', title: 'Same Name Book', author: 'Another Author' } as any
     ]);
   });
 
@@ -55,23 +55,23 @@ describe('Given the BoardGames Page', () => {
 
       // When
       const searchParams = Promise.resolve({});
-      const ResolvedPage = await BoardGamesPage({ searchParams });
+      const ResolvedPage = await BooksPage({ searchParams });
       render(ResolvedPage);
 
       // Then
-      expect(screen.getAllByText('Test Game')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Test Book')[0]).toBeInTheDocument();
 
       if (canEdit) {
-        expect(screen.getAllByText('Add new board game')[0]).toBeInTheDocument();
-        expect(screen.getAllByText('New Board Game')[0]).toBeInTheDocument(); // The Upsert Modal hidden title
+        expect(screen.getAllByText('Add new book')[0]).toBeInTheDocument();
+        expect(screen.getAllByText('New Book')[0]).toBeInTheDocument(); // The Upsert Modal hidden title
       } else {
-        expect(screen.queryByText('Add new board game')).not.toBeInTheDocument();
+        expect(screen.queryByText('Add new book')).not.toBeInTheDocument();
       }
     });
   });
 
   describe('When the current view is grid', () => {
-    it('Then it renders the board games as cards', async () => {
+    it('Then it renders the books as cards', async () => {
       // Given
       const { cookies } = await import('next/headers');
       vi.mocked(cookies).mockResolvedValueOnce({
@@ -80,12 +80,12 @@ describe('Given the BoardGames Page', () => {
 
       // When
       const searchParams = Promise.resolve({});
-      const ResolvedPage = await BoardGamesPage({ searchParams });
+      const ResolvedPage = await BooksPage({ searchParams });
       render(ResolvedPage);
 
       // Then
-      expect(screen.getAllByText('Test Game')[0]).toBeInTheDocument();
-      // Test Game and Another Game cards should render, check for "No Image" text from the placeholder
+      expect(screen.getAllByText('Test Book')[0]).toBeInTheDocument();
+      // Test Book and Another Book cards should render, check for "No Image" text from the placeholder
       expect(screen.getAllByText('No Image')[0]).toBeInTheDocument();
     });
   });

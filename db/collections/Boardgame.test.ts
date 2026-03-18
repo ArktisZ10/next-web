@@ -39,6 +39,7 @@ describe('Given a connected MongoDB instance for boardgames', () => {
         minPlayers: 3,
         maxPlayers: 4,
         publisher: 'Kosmos',
+        image: 'https://example.com/catan.jpg',
       };
 
       // When
@@ -48,6 +49,34 @@ describe('Given a connected MongoDB instance for boardgames', () => {
       expect(inserted).toHaveProperty('_id');
       expect(inserted.name).toBe('Settlers of Catan');
       expect(inserted.minPlayers).toBe(3);
+      expect(inserted.image).toBe('https://example.com/catan.jpg');
+    });
+  });
+
+  describe('When retrieving the list of boardgames with filters', () => {
+    it('Then it filters correctly by search, players, and playtime', async () => {
+      // Given
+      await insertBoardgame({ name: 'Zombicide', minPlayers: 1, maxPlayers: 6, minPlayTime: 60, maxPlayTime: 120 });
+      await insertBoardgame({ name: 'Catan', minPlayers: 3, maxPlayers: 4, minPlayTime: 60, maxPlayTime: 120 });
+      await insertBoardgame({ name: 'Ticket to Ride', minPlayers: 2, maxPlayers: 5, minPlayTime: 30, maxPlayTime: 60 });
+      await insertBoardgame({ name: 'Chess', minPlayers: 2, maxPlayers: 2, minPlayTime: 5, maxPlayTime: 30 });
+      await insertBoardgame({ name: 'Mystic', minPlayers: null as any, maxPlayers: null as any, maxPlayTime: null as any }); // Testing nulls
+
+      // When
+      const searchGames = await getBoardgames({ search: 'cat' });
+      const playerGames = await getBoardgames({ players: 5 });
+      const playtimeGames = await getBoardgames({ playtime: 60 });
+
+      // Then
+      expect(searchGames).toHaveLength(1); // Catan
+      expect(searchGames.map(g => g.name)).toContain('Catan');
+      
+      expect(playerGames).toHaveLength(3); // Zombicide, Ticket to Ride, Mystic(nulls)
+      expect(playerGames.map(g => g.name)).not.toContain('Catan');
+      expect(playerGames.map(g => g.name)).not.toContain('Chess');
+
+      expect(playtimeGames).toHaveLength(4); // Zombicide, Catan, Ticket to Ride, Mystic(nulls)
+      expect(playtimeGames.map(g => g.name)).not.toContain('Chess'); 
     });
   });
 
@@ -116,6 +145,7 @@ describe('Given form data representing a boardgame to be saved', () => {
       // Given
       const formData = new FormData();
       formData.append('name', 'Chess');
+      formData.append('image', 'https://example.com/chess.jpg');
       formData.append('players_min', '2');
       formData.append('players_max', '2');
       formData.append('playtime_min', '30');
@@ -128,6 +158,7 @@ describe('Given form data representing a boardgame to be saved', () => {
 
       // Then
       expect(result.name).toBe('Chess');
+      expect(result.image).toBe('https://example.com/chess.jpg');
       expect(result.minPlayers).toBe(2);
       expect(result.maxPlayers).toBe(2);
       expect(result.minPlayTime).toBe(30);
@@ -148,6 +179,7 @@ describe('Given form data representing a boardgame to be saved', () => {
 
       // Then
       expect(result.name).toBe('Go');
+      expect(result.image).toBeUndefined();
       expect(result.minPlayers).toBeUndefined();
       expect(result.maxPlayers).toBeUndefined();
       expect(result.publisher).toBeUndefined();

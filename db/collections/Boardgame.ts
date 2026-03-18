@@ -1,9 +1,13 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
+import mongoose from "mongoose";
 import { dbConnect } from "../mongoose";
 
 export class Boardgame {
   @prop({ required: true })
   name!: string;
+
+  @prop()
+  image?: string;
 
   @prop()
   minPlayers?: number;
@@ -36,7 +40,7 @@ export class Boardgame {
   updatedAt?: Date;
 }
 
-export const BoardgameModel = getModelForClass(Boardgame, {
+export const BoardgameModel = mongoose.models.Boardgame || getModelForClass(Boardgame, {
   schemaOptions: { collection: 'boardgame' }
 });
 
@@ -57,11 +61,12 @@ function toBoardgameEntity(doc: DocumentType<Boardgame>): BoardgameEntity {
 
 export function fromFormData(formData: FormData): Boardgame {
   const name = formData.get('name')?.toString() || '';
+  const image = formData.get('image')?.toString();
   const minPlayers = formData.get('players_min') ? parseInt(formData.get('players_min')!.toString(), 10) : undefined;
   const maxPlayers = formData.get('players_max') ? parseInt(formData.get('players_max')!.toString(), 10) : undefined;
   const minPlayTime = formData.get('playtime_min') ? parseInt(formData.get('playtime_min')!.toString(), 10) : undefined;
   const maxPlayTime = formData.get('playtime_max') ? parseInt(formData.get('playtime_max')!.toString(), 10) : undefined;
-  const publisher = formData.get('publisher')?.toString() || undefined;
+  const publisher = formData.get('publisher')?.toString();
   const yearPublished = formData.get('year_published') ? parseInt(formData.get('year_published')!.toString(), 10) : undefined;
 
   if (!name) {
@@ -70,6 +75,7 @@ export function fromFormData(formData: FormData): Boardgame {
 
   return {
     name,
+    image,
     minPlayers,
     maxPlayers,
     minPlayTime,
@@ -79,9 +85,38 @@ export function fromFormData(formData: FormData): Boardgame {
   };
 }
   
-export async function getBoardgames(): Promise<BoardgameEntity[]> {
+export interface BoardgameFilter {
+  search?: string;
+  players?: number;
+  playtime?: number;
+}
+
+export async function getBoardgames(filter?: BoardgameFilter): Promise<BoardgameEntity[]> {
   await dbConnect();
-  const boardgames = await BoardgameModel.find().sort({ name: 1 });
+  
+  const query: mongoose.QueryFilter<Boardgame> = {};
+  
+  if (filter?.search) {
+    query.name = { $regex: filter.search, $options: 'i' };
+  }
+
+  if (filter?.players !== undefined) {
+    query.$and = query.$and || [];
+    query.$and.push(
+      { $or: [{ minPlayers: { $lte: filter.players } }, { minPlayers: null }, { minPlayers: { $exists: false } }] },
+      { $or: [{ maxPlayers: { $gte: filter.players } }, { maxPlayers: null }, { maxPlayers: { $exists: false } }] }
+    );
+  }
+
+  if (filter?.playtime !== undefined) {
+    query.$and = query.$and || [];
+    query.$and.push(
+      { $or: [{ minPlayTime: { $lte: filter.playtime } }, { minPlayTime: null }, { minPlayTime: { $exists: false } }] },
+      { $or: [{ maxPlayTime: { $gte: filter.playtime } }, { maxPlayTime: null }, { maxPlayTime: { $exists: false } }] }
+    );
+  }
+  
+  const boardgames = await BoardgameModel.find(query).sort({ name: 1 });
   return boardgames.map(toBoardgameEntity);
 }
 

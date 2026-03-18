@@ -19,9 +19,12 @@ export default function UpsertModal({editObject, action, dialogRef}: UpsertModal
                     <form action={action}>
 
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-                    <legend className="text-lg font-bold bg-base-200 rounded-xl px-2">{editObject ? "Edit Boardgame" : "New Boardgame"}</legend>
+                    <legend className="text-lg font-bold bg-base-200 rounded-xl px-2">{editObject ? "Edit Board Game" : "New Board Game"}</legend>
                     <label className="label">Title</label>
                     <input type="text" name="name" className="input" placeholder="Awesome game" defaultValue={editObject?.name} />
+
+                    <label className="label">Image URL</label>
+                    <input type="text" name="image" className="input" placeholder="https://example.com/image.jpg" defaultValue={editObject?.image} />
 
                     <label className="label">Players</label>
                     <div className="flex space-x-4">

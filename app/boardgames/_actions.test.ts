@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { addBoardgameAction, editBoardgameAction, removeBoardgame } from './_actions';
+import { addBoardgameAction, editBoardgameAction, removeBoardgame, setViewAction } from './_actions';
 import { auth } from '@/lib/auth';
 import * as db from '@/db/collections/Boardgame';
 
@@ -12,7 +12,10 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: vi.fn(() => new Headers())
+  headers: vi.fn(() => new Headers()),
+  cookies: vi.fn(() => ({
+    set: vi.fn()
+  }))
 }));
 
 vi.mock('next/cache', () => ({
@@ -115,6 +118,23 @@ describe('Given the Boardgame Server Actions', () => {
       
       // Then
       await expect(removePromise).rejects.toThrow('ID is required');
+    });
+  });
+
+  describe('When a user sets the boardgame view preference', () => {
+    it('Then it sets the boardgameView cookie and revalidates the path', async () => {
+      // Given
+      const { cookies } = await import('next/headers');
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValueOnce({ set: mockSet } as any);
+      const { revalidatePath } = await import('next/cache');
+
+      // When
+      await setViewAction('grid');
+
+      // Then
+      expect(mockSet).toHaveBeenCalledWith('boardgameView', 'grid', expect.any(Object));
+      expect(revalidatePath).toHaveBeenCalledWith('/boardgames');
     });
   });
 });

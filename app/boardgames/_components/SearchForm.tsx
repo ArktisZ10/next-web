@@ -59,7 +59,7 @@ export default function SearchForm() {
             <div className="w-2 h-2 rounded-full bg-primary ml-1"></div>
           )}
         </div>
-        <div tabIndex={0} className="dropdown-content z-100 p-4 shadow-xl bg-base-100 rounded-box w-64 mt-2 border border-base-200 flex flex-col gap-3">
+        <div tabIndex={0} className="dropdown-content z-50 p-4 shadow-xl bg-base-100 rounded-box w-64 mt-2 border border-base-200 flex flex-col gap-3">
           <div className="form-control">
             <label className="label py-1">
               <span className="label-text font-medium">Player Count</span>

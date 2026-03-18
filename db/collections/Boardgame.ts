@@ -61,12 +61,12 @@ function toBoardgameEntity(doc: DocumentType<Boardgame>): BoardgameEntity {
 
 export function fromFormData(formData: FormData): Boardgame {
   const name = formData.get('name')?.toString() || '';
-  const image = formData.get('image')?.toString() || undefined;
+  const image = formData.get('image')?.toString();
   const minPlayers = formData.get('players_min') ? parseInt(formData.get('players_min')!.toString(), 10) : undefined;
   const maxPlayers = formData.get('players_max') ? parseInt(formData.get('players_max')!.toString(), 10) : undefined;
   const minPlayTime = formData.get('playtime_min') ? parseInt(formData.get('playtime_min')!.toString(), 10) : undefined;
   const maxPlayTime = formData.get('playtime_max') ? parseInt(formData.get('playtime_max')!.toString(), 10) : undefined;
-  const publisher = formData.get('publisher')?.toString() || undefined;
+  const publisher = formData.get('publisher')?.toString();
   const yearPublished = formData.get('year_published') ? parseInt(formData.get('year_published')!.toString(), 10) : undefined;
 
   if (!name) {
@@ -94,7 +94,7 @@ export interface BoardgameFilter {
 export async function getBoardgames(filter?: BoardgameFilter): Promise<BoardgameEntity[]> {
   await dbConnect();
   
-  const query: any = {};
+  const query: mongoose.QueryFilter<Boardgame> = {};
   
   if (filter?.search) {
     query.name = { $regex: filter.search, $options: 'i' };

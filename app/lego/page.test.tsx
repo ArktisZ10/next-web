@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import BoardGamesPage from './page';
+import LegoPage from './page';
 import { auth } from '@/lib/auth';
-import * as db from '@/db/collections/Boardgame';
+import * as db from '@/db/collections/Lego';
 
 vi.mock('@/lib/auth', () => ({
   auth: {
@@ -22,17 +22,18 @@ vi.mock('next/navigation', () => ({
   useSearchParams: vi.fn(() => new URLSearchParams())
 }));
 
-vi.mock('@/db/collections/Boardgame', () => ({
-  getBoardgames: vi.fn()
+vi.mock('@/db/collections/Lego', () => ({
+  getLegos: vi.fn()
 }));
 
-describe('Given the BoardGames Page', () => {
+describe('Given the Lego Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(db.getBoardgames).mockResolvedValue([
-      { id: '1', name: 'Test Game', minPlayers: 2, maxPlayers: 4, image: 'https://example.com/test.jpg', publisher: 'Test Pub', yearPublished: 2020 } as any,
-      { id: '2', name: 'Another Game', minPlayTime: 30, maxPlayTime: 60 } as any,
-      { id: '3', name: 'Same Number Game', minPlayers: 4, maxPlayers: 4, minPlayTime: 45, maxPlayTime: 45 } as any
+    vi.mocked(db.getLegos).mockResolvedValue([
+      { id: '1', name: 'Test Lego', setNumber: '123', pieceCount: 100, image: 'https://example.com/test.jpg', theme: 'Test Theme', yearReleased: 2020, minifigures: 2 } as any,
+      { id: '2', name: 'Another Lego', setNumber: '456', pieceCount: 200 } as any,
+      { id: '3', name: 'Same Number Lego', pieceCount: 300 } as any,
+      { id: '4', name: 'No Details Lego' } as any
     ]);
   });
 
@@ -55,23 +56,23 @@ describe('Given the BoardGames Page', () => {
 
       // When
       const searchParams = Promise.resolve({});
-      const ResolvedPage = await BoardGamesPage({ searchParams });
+      const ResolvedPage = await LegoPage({ searchParams });
       render(ResolvedPage);
 
       // Then
-      expect(screen.getAllByText('Test Game')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Test Lego')[0]).toBeInTheDocument();
 
       if (canEdit) {
-        expect(screen.getAllByText('Add new board game')[0]).toBeInTheDocument();
-        expect(screen.getAllByText('New Board Game')[0]).toBeInTheDocument(); // The Upsert Modal hidden title
+        expect(screen.getAllByText('Add new lego')[0]).toBeInTheDocument();
+        expect(screen.getAllByText('New Lego')[0]).toBeInTheDocument(); // The Upsert Modal hidden title
       } else {
-        expect(screen.queryByText('Add new board game')).not.toBeInTheDocument();
+        expect(screen.queryByText('Add new lego')).not.toBeInTheDocument();
       }
     });
   });
 
   describe('When the current view is grid', () => {
-    it('Then it renders the board games as cards', async () => {
+    it('Then it renders the legos as cards', async () => {
       // Given
       const { cookies } = await import('next/headers');
       vi.mocked(cookies).mockResolvedValueOnce({
@@ -80,12 +81,12 @@ describe('Given the BoardGames Page', () => {
 
       // When
       const searchParams = Promise.resolve({});
-      const ResolvedPage = await BoardGamesPage({ searchParams });
+      const ResolvedPage = await LegoPage({ searchParams });
       render(ResolvedPage);
 
       // Then
-      expect(screen.getAllByText('Test Game')[0]).toBeInTheDocument();
-      // Test Game and Another Game cards should render, check for "No Image" text from the placeholder
+      expect(screen.getAllByText('Test Lego')[0]).toBeInTheDocument();
+      // Test Lego and Another Lego cards should render, check for "No Image" text from the placeholder
       expect(screen.getAllByText('No Image')[0]).toBeInTheDocument();
     });
   });

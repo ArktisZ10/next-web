@@ -1,25 +1,29 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, ReactNode } from "react";
 
-export default function SearchForm() {
+export default function SearchForm({ placeholder, children }: { placeholder: string, children?: ReactNode }) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
 
     const handleSearch = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
+            const formData = new FormData(e.currentTarget);
             const params = new URLSearchParams(searchParams.toString());
-            if (searchTerm) {
-                params.set("q", searchTerm);
-            } else {
-                params.delete("q");
+            
+            for (const [key, value] of formData.entries()) {
+                const strValue = value.toString().trim();
+                if (strValue) {
+                    params.set(key, strValue);
+                } else {
+                    params.delete(key);
+                }
             }
             router.push(`?${params.toString()}`);
         },
-        [searchTerm, searchParams, router]
+        [searchParams, router]
     );
 
     return (
@@ -27,15 +31,16 @@ export default function SearchForm() {
             <div className="join shadow-sm">
                 <input
                     type="text"
-                    placeholder="Search lego..."
+                    name="q"
+                    placeholder={placeholder}
                     className="input input-bordered join-item input-sm w-48 md:w-64"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    defaultValue={searchParams.get("q") || ""}
                 />
                 <button type="submit" className="btn btn-sm join-item btn-primary">
                     Search
                 </button>
             </div>
+            {children}
         </form>
     );
 }

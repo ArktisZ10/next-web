@@ -1,9 +1,11 @@
 import { getLegos, LegoEntity } from "@/db/collections/Lego";
-import AddModalButton from "./_components/AddModalButton";
-import EditModalButton from "./_components/EditModalButton";
-import RemoveButton from "./_components/DeleteButton";
+import UpsertModal from "./_components/UpsertModal";
+import { addLegoAction, editLegoAction, removeLego } from "./_actions";
+import AddButton from "../_components/AddButton";
+import EditButton from "../_components/EditButton";
+import DeleteButton from "../_components/DeleteButton";
 import ViewToggle from "../_components/ViewToggle";
-import SearchForm from "./_components/SearchForm";
+import SearchForm from "../_components/SearchForm";
 import CollectionView from "../_components/CollectionView";
 import { auth } from "@/lib/auth";
 import { headers, cookies } from "next/headers";
@@ -49,10 +51,10 @@ export default async function LegoPage(props: {
                 <div className="flex justify-between items-center w-full gap-4">
                     <div className="flex-none flex items-center gap-4">
                         <h1 className="text-3xl font-bold">Lego</h1>
-                        {hasWriteAccess && <AddModalButton />}
+                        {hasWriteAccess && <AddButton label="Add new lego"><UpsertModal action={addLegoAction} /></AddButton>}
                     </div>
                     <div className="grow flex justify-end">
-                        <SearchForm />
+                        <SearchForm placeholder="Search lego..." />
                     </div>
                     <div className="flex-none">
                         <ViewToggle currentView={currentView} cookieName="legoView" />
@@ -87,8 +89,8 @@ export default async function LegoPage(props: {
                             </div>
                             {hasWriteAccess && (
                                 <div className="card-actions justify-end mt-2 pt-2 border-t border-base-200">
-                                    <EditModalButton editObject={lego} />
-                                    <RemoveButton id={lego.id} />
+                                    <EditButton><UpsertModal editObject={lego} action={editLegoAction.bind(null, lego.id!)} /></EditButton>
+                                    <DeleteButton id={lego.id!} action={removeLego} />
                                 </div>
                             )}
                         </div>
@@ -130,8 +132,8 @@ export default async function LegoPage(props: {
                             <div className="flex justify-end space-x-2">
                                 {hasWriteAccess && (
                                     <>
-                                        <EditModalButton editObject={lego} />
-                                        <RemoveButton id={lego.id} />
+                                        <EditButton><UpsertModal editObject={lego} action={editLegoAction.bind(null, lego.id!)} /></EditButton>
+                                        <DeleteButton id={lego.id!} action={removeLego} />
                                     </>
                                 )}
                             </div>

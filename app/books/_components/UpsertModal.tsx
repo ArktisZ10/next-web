@@ -4,7 +4,7 @@ import { BookEntity } from "@/db/collections/Book";
 interface UpsertModalProps {
     editObject?: BookEntity,
     action: (formData: FormData) => void | Promise<void>
-    dialogRef: RefObject<HTMLDialogElement | null>
+    dialogRef?: RefObject<HTMLDialogElement | null>
 }
 
 export default function UpsertModal({editObject, action, dialogRef}: UpsertModalProps) {
@@ -41,8 +41,8 @@ export default function UpsertModal({editObject, action, dialogRef}: UpsertModal
                 </div>
                 
                 <div className="modal-action">
-                    <button type="button" className="btn btn-outline btn-primary" onClick={() => dialogRef.current?.close()}>Cancel</button>
-                    <button type="submit" className="btn btn-primary" onClick={() => dialogRef.current?.close()}>Save</button>
+                    <button type="button" className="btn btn-outline btn-primary" onClick={() => dialogRef?.current?.close()}>Cancel</button>
+                    <button type="submit" className="btn btn-primary" onClick={() => dialogRef?.current?.close()}>Save</button>
                 </div>
             </fieldset>
         </form>

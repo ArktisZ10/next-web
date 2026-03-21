@@ -12,6 +12,7 @@ vi.mock('better-auth/react', () => ({
 describe('Given the getBaseURL logic in auth-client', () => {
   const savedEnv: Record<string, string | undefined> = {};
   const envKeys = ['NEXT_PUBLIC_APP_URL', 'VERCEL_URL', 'VERCEL_ENV'];
+  let originalWindow: any;
 
   beforeEach(() => {
     vi.resetModules();
@@ -20,7 +21,8 @@ describe('Given the getBaseURL logic in auth-client', () => {
       savedEnv[key] = process.env[key];
       delete process.env[key];
     }
-    // ensure window is not defined to trigger node environment block
+    // save window if exists and ensure window is not defined by default
+    originalWindow = (globalThis as any).window;
     // @ts-ignore
     delete globalThis.window;
   });
@@ -33,6 +35,23 @@ describe('Given the getBaseURL logic in auth-client', () => {
         delete process.env[key];
       }
     }
+    // @ts-ignore
+    globalThis.window = originalWindow;
+  });
+
+  describe('When Browser Side (window is defined)', () => {
+    it('Then it uses window.location.origin', async () => {
+      // Given
+      (globalThis as any).window = { location: { origin: 'https://browser.example.com' } };
+
+      // When
+      await import('@/lib/auth-client');
+
+      // Then
+      expect(mockCreateAuthClient).toHaveBeenCalledWith(
+        expect.objectContaining({ baseURL: 'https://browser.example.com' }),
+      );
+    });
   });
 
   describe('When Server Side with NEXT_PUBLIC_APP_URL', () => {

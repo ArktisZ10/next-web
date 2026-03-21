@@ -4,13 +4,13 @@ import { LegoEntity } from "@/db/collections/Lego";
 interface UpsertModalProps {
     editObject?: LegoEntity,
     action: (formData: FormData) => void | Promise<void>
-    dialogRef: RefObject<HTMLDialogElement | null>
+    dialogRef?: RefObject<HTMLDialogElement | null>
 }
 
 export default function UpsertModal({editObject, action, dialogRef}: UpsertModalProps) {
     return <dialog ref={dialogRef} className="modal overflow-auto">
         <form action={action}>
-            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-[90vw] max-w-sm border p-4">
                 <legend className="text-lg font-bold bg-base-200 rounded-xl px-2">{editObject ? "Edit Lego" : "New Lego"}</legend>
                 
                 <label className="label">Name</label>
@@ -41,8 +41,8 @@ export default function UpsertModal({editObject, action, dialogRef}: UpsertModal
                 </div>
                 
                 <div className="modal-action">
-                    <button type="button" className="btn btn-outline btn-primary" onClick={() => dialogRef.current?.close()}>Cancel</button>
-                    <button type="submit" className="btn btn-primary" onClick={() => dialogRef.current?.close()}>Save</button>
+                    <button type="button" className="btn btn-outline btn-primary" onClick={() => dialogRef?.current?.close()}>Cancel</button>
+                    <button type="submit" className="btn btn-primary" onClick={() => dialogRef?.current?.close()}>Save</button>
                 </div>
             </fieldset>
         </form>

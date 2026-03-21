@@ -1,9 +1,11 @@
 import { getBooks, BookEntity } from "@/db/collections/Book";
-import AddModalButton from "./_components/AddModalButton";
-import EditModalButton from "./_components/EditModalButton";
-import RemoveButton from "./_components/DeleteButton";
+import UpsertModal from "./_components/UpsertModal";
+import { addBookAction, editBookAction, removeBook } from "./_actions";
+import AddButton from "../_components/AddButton";
+import EditButton from "../_components/EditButton";
+import DeleteButton from "../_components/DeleteButton";
 import ViewToggle from "../_components/ViewToggle";
-import SearchForm from "./_components/SearchForm";
+import SearchForm from "../_components/SearchForm";
 import CollectionView from "../_components/CollectionView";
 import { auth } from "@/lib/auth";
 import { headers, cookies } from "next/headers";
@@ -49,10 +51,10 @@ export default async function BooksPage(props: {
                 <div className="flex justify-between items-center w-full gap-4">
                     <div className="flex-none flex items-center gap-4">
                         <h1 className="text-3xl font-bold">Books</h1>
-                        {hasWriteAccess && <AddModalButton />}
+                        {hasWriteAccess && <AddButton label="Add new book"><UpsertModal action={addBookAction} /></AddButton>}
                     </div>
                     <div className="grow flex justify-end">
-                        <SearchForm />
+                        <SearchForm placeholder="Search books..." />
                     </div>
                     <div className="flex-none">
                         <ViewToggle currentView={currentView} cookieName="booksView" />
@@ -87,8 +89,8 @@ export default async function BooksPage(props: {
                             </div>
                             {hasWriteAccess && (
                                 <div className="card-actions justify-end mt-2 pt-2 border-t border-base-200">
-                                    <EditModalButton editObject={book} />
-                                    <RemoveButton id={book.id} />
+                                    <EditButton><UpsertModal editObject={book} action={editBookAction.bind(null, book.id!)} /></EditButton>
+                                    <DeleteButton id={book.id!} action={removeBook} />
                                 </div>
                             )}
                         </div>
@@ -130,8 +132,8 @@ export default async function BooksPage(props: {
                             <div className="flex justify-end space-x-2">
                                 {hasWriteAccess && (
                                     <>
-                                        <EditModalButton editObject={book} />
-                                        <RemoveButton id={book.id} />
+                                        <EditButton><UpsertModal editObject={book} action={editBookAction.bind(null, book.id!)} /></EditButton>
+                                        <DeleteButton id={book.id!} action={removeBook} />
                                     </>
                                 )}
                             </div>

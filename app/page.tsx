@@ -2,18 +2,18 @@ import Image from 'next/image';
 
 export default function Home() {
   return (
-    <div className="hero min-h-[calc(100vh-4rem)] max-w-screen-2xl mx-auto shadow-2xl shadow-black relative overflow-hidden">
+    <div className="hero flex-1 relative overflow-hidden">
       <Image
         src="/backdrop.jpg"
         alt="Background"
         fill
-        className="object-cover object-center -z-10"
+        className="object-cover object-center z-0"
         priority
         sizes="(max-width: 1536px) 100vw, 1536px"
       />
-      <div className="hero-overlay bg-black/60 backdrop-blur-xs"></div>
+      <div className="hero-overlay bg-black/60 backdrop-blur-xs z-10 relative"></div>
       
-      <div className="hero-content text-center text-neutral-content">
+      <div className="hero-content text-center text-neutral-content z-20 relative">
         <div className="max-w-md w-full">
           <h1 className="text-6xl font-extrabold mb-5 drop-shadow-lg bg-linear-to-br from-slate-200 via-sky-200 to-emerald-300 bg-clip-text text-transparent mt-4">
             Hello there!

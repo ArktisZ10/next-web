@@ -27,16 +27,16 @@ export default function SearchForm({ placeholder, children }: { placeholder: str
     );
 
     return (
-        <form onSubmit={handleSearch} className="flex gap-2 items-center justify-center">
-            <div className="join shadow-sm">
+        <form onSubmit={handleSearch} className="flex gap-2 items-center justify-center w-full md:w-auto">
+            <div className="join shadow-sm w-full md:w-auto flex">
                 <input
                     type="text"
                     name="q"
                     placeholder={placeholder}
-                    className="input input-bordered join-item input-sm w-48 md:w-64"
+                    className="input input-bordered join-item input-sm w-full md:w-64"
                     defaultValue={searchParams.get("q") || ""}
                 />
-                <button type="submit" className="btn btn-sm join-item btn-primary">
+                <button type="submit" className="btn btn-sm join-item btn-primary shrink-0">
                     Search
                 </button>
             </div>

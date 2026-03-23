@@ -35,7 +35,7 @@ describe('Given the suggestBook action', () => {
     expect(result).toEqual(mockOutput);
     expect(generateText).toHaveBeenCalledWith(expect.objectContaining({
       model: 'mock-google-model',
-      prompt: expect.stringContaining('Fill in the missing details for a book'),
+      prompt: expect.stringContaining('Identify the specific a book'),
     }));
   });
 });
@@ -62,7 +62,7 @@ describe('Given the suggestLego action', () => {
     expect(result).toEqual(mockOutput);
     expect(generateText).toHaveBeenCalledWith(expect.objectContaining({
       model: 'mock-google-model',
-      prompt: expect.stringContaining('Fill in the missing details for a Lego set'),
+      prompt: expect.stringContaining('Identify the specific a Lego set'),
     }));
   });
 });
@@ -89,7 +89,7 @@ describe('Given the suggestBoardgame action', () => {
     expect(result).toEqual(mockOutput);
     expect(generateText).toHaveBeenCalledWith(expect.objectContaining({
       model: 'mock-google-model',
-      prompt: expect.stringContaining('Fill in the missing details for a board game'),
+      prompt: expect.stringContaining('Identify the specific a board game'),
     }));
   });
 });

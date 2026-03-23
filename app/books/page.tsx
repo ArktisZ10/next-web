@@ -46,17 +46,22 @@ export default async function BooksPage(props: {
     const hasWriteAccess = session?.user?.role === 'admin' || session?.user?.role === 'write';
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             <div className="flex flex-col gap-4 mb-6">
-                <div className="flex justify-between items-center w-full gap-4">
-                    <div className="flex-none flex items-center gap-4">
-                        <h1 className="text-3xl font-bold">Books</h1>
-                        {hasWriteAccess && <AddButton label="Add new book"><UpsertModal action={addBookAction} /></AddButton>}
+                <div className="flex flex-col md:flex-row justify-between md:items-center w-full gap-4">
+                    <div className="flex justify-between items-center w-full md:w-auto">
+                        <div className="flex-none flex items-center gap-4">
+                            <h1 className="text-3xl font-bold">Books</h1>
+                            {hasWriteAccess && <AddButton label="Add new book"><UpsertModal action={addBookAction} /></AddButton>}
+                        </div>
+                        <div className="md:hidden">
+                            <ViewToggle currentView={currentView} cookieName="booksView" />
+                        </div>
                     </div>
-                    <div className="grow flex justify-end">
+                    <div className="w-full md:w-auto grow flex justify-start md:justify-end">
                         <SearchForm placeholder="Search books..." />
                     </div>
-                    <div className="flex-none">
+                    <div className="hidden md:block flex-none">
                         <ViewToggle currentView={currentView} cookieName="booksView" />
                     </div>
                 </div>

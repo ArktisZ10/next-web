@@ -7,13 +7,13 @@ export default function Home() {
         src="/backdrop.jpg"
         alt="Background"
         fill
-        className="object-cover object-center z-0"
+        className="object-cover object-center"
         priority
         sizes="(max-width: 1536px) 100vw, 1536px"
       />
-      <div className="hero-overlay bg-black/60 backdrop-blur-xs z-10 relative"></div>
+      <div className="hero-overlay bg-black/60 backdrop-blur-xs relative"></div>
       
-      <div className="hero-content text-center text-neutral-content z-20 relative">
+      <div className="hero-content text-center text-neutral-content relative">
         <div className="max-w-md w-full">
           <h1 className="text-6xl font-extrabold mb-5 drop-shadow-lg bg-linear-to-br from-slate-200 via-sky-200 to-emerald-300 bg-clip-text text-transparent mt-4">
             Hello there!

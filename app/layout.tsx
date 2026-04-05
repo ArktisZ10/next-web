@@ -34,7 +34,7 @@ export default function RootLayout({
         <div className="drawer h-full w-full">
           <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col h-full overflow-hidden">
-            <header className="navbar bg-base-300 shadow-sm relative z-50">
+            <header className="navbar bg-base-300 shadow-sm relative">
             <div className="flex-none">
               <label htmlFor="nav-drawer" className="btn btn-square btn-ghost">
                 <Bars3Icon className="h-5 w-5" />

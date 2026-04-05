@@ -1,0 +1,26 @@
+import { ButtonHTMLAttributes } from 'react';
+
+interface AiSparkleButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    text?: string;
+    loading?: boolean;
+}
+
+export default function AiSparkleButton({ text, loading, className = '', ...props }: AiSparkleButtonProps) {
+    return (
+        <button 
+            type="button" 
+            className={`btn bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 text-white border-none hover:opacity-90 transition-opacity disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 disabled:text-gray-200 ${className}`}
+            disabled={loading || props.disabled}
+            {...props}
+        >
+            {loading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+            ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5z" clipRule="evenodd" />
+                </svg>
+            )}
+            {text && <span>{text}</span>}
+        </button>
+    );
+}

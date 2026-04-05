@@ -1,6 +1,7 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import mongoose from "mongoose";
 import { dbConnect } from "../mongoose";
+import { z } from "zod";
 
 export class Book {
   @prop({ required: true })
@@ -36,6 +37,21 @@ export class Book {
   @prop()
   updatedAt?: Date;
 }
+
+/**
+ * Zod schema for AI data extraction and validation.
+ * Strictly typed against the Typegoose `Book` class to ensure the schema
+ * always stays in sync with the database model.
+ */
+export const bookSchema: z.ZodType<Partial<Book>> = z.object({
+  title: z.string().optional().describe('The title of the book'),
+  author: z.string().optional().describe('The author of the book'),
+  image: z.string().optional().describe('A valid url to an image cover of the book'),
+  isbn: z.string().optional().describe('The ISBN-10 or ISBN-13 of the book'),
+  publisher: z.string().optional().describe('The publisher of the book'),
+  yearPublished: z.number().optional().describe('The year the book was published'),
+  pages: z.number().optional().describe('The number of pages in the book'),
+});
 
 export const BookModel = mongoose.models.Book || getModelForClass(Book, {
   schemaOptions: { collection: 'book' }

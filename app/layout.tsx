@@ -30,10 +30,11 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased drawer`}>
-        <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content">
-          <header className="navbar bg-base-300 shadow-sm relative z-50">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-dvh w-dvw overflow-hidden bg-base-200`}>
+        <div className="drawer h-full w-full">
+          <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-content flex flex-col h-full overflow-hidden">
+            <header className="navbar bg-base-300 shadow-sm relative">
             <div className="flex-none">
               <label htmlFor="nav-drawer" className="btn btn-square btn-ghost">
                 <Bars3Icon className="h-5 w-5" />
@@ -67,9 +68,11 @@ export default function RootLayout({
               </a>
             </div>
           </header>
-          {children}
-        </div>
-        <nav className="drawer-side">
+            <main className="flex-1 w-full max-w-screen-2xl mx-auto shadow-2xl shadow-black relative bg-base-100 overflow-x-hidden overflow-y-auto flex flex-col">
+              {children}
+            </main>
+          </div>
+          <nav className="drawer-side">
           <label htmlFor="nav-drawer" aria-label="close sidebar" className="drawer-overlay cursor-default" />
           <div className="bg-base-200 min-h-full w-80 flex flex-col shadow-xl">
             <div className="p-4 border-b border-base-300">
@@ -117,6 +120,7 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
+        </div>
       </body>
     </html>
   );

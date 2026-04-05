@@ -35,21 +35,21 @@ export default function SearchForm() {
   );
 
   return (
-    <form onSubmit={handleSearch} className="flex gap-2 items-center justify-center">
-      <div className="join shadow-sm">
+    <form onSubmit={handleSearch} className="flex gap-2 items-center justify-center w-full md:w-auto">
+      <div className="join shadow-sm w-full md:w-auto flex">
         <input
           type="text"
           placeholder="Search games..."
-          className="input input-bordered join-item input-sm w-48 md:w-64"
+          className="input input-bordered join-item input-sm w-full md:w-64"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button type="submit" className="btn btn-sm join-item btn-primary">
+        <button type="submit" className="btn btn-sm join-item btn-primary shrink-0">
           Search
         </button>
       </div>
 
-      <div className="dropdown dropdown-end">
+      <div className="dropdown dropdown-end shrink-0">
         <div tabIndex={0} role="button" className="btn btn-sm btn-ghost border-base-300">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -59,7 +59,7 @@ export default function SearchForm() {
             <div className="w-2 h-2 rounded-full bg-primary ml-1"></div>
           )}
         </div>
-        <div tabIndex={0} className="dropdown-content z-50 p-4 shadow-xl bg-base-100 rounded-box w-64 mt-2 border border-base-200 flex flex-col gap-3">
+        <div tabIndex={0} className="dropdown-content p-4 shadow-xl bg-base-100 rounded-box w-64 mt-2 border border-base-200 flex flex-col gap-3">
           <div className="form-control">
             <label className="label py-1">
               <span className="label-text font-medium">Player Count</span>

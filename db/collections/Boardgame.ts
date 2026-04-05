@@ -1,6 +1,7 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import mongoose from "mongoose";
 import { dbConnect } from "../mongoose";
+import { z } from "zod";
 
 export class Boardgame {
   @prop({ required: true })
@@ -40,6 +41,22 @@ export class Boardgame {
   updatedAt?: Date;
 }
 
+/**
+ * Zod schema for AI data extraction and validation.
+ * Strictly typed against the Typegoose `Boardgame` class to ensure the schema
+ * always stays in sync with the database model.
+ */
+export const boardgameSchema: z.ZodType<Partial<Boardgame>> = z.object({
+  name: z.string().optional().describe('The name of the board game'),
+  image: z.string().optional().describe('A valid url to an image of the board game'),
+  minPlayers: z.number().optional().describe('The minimum number of players'),
+  maxPlayers: z.number().optional().describe('The maximum number of players'),
+  minPlayTime: z.number().optional().describe('The minimum playtime in minutes'),
+  maxPlayTime: z.number().optional().describe('The maximum playtime in minutes'),
+  publisher: z.string().optional().describe('The publisher of the board game'),
+  yearPublished: z.number().optional().describe('The year the board game was published'),
+});
+
 export const BoardgameModel = mongoose.models.Boardgame || getModelForClass(Boardgame, {
   schemaOptions: { collection: 'boardgame' }
 });
@@ -62,12 +79,18 @@ function toBoardgameEntity(doc: DocumentType<Boardgame>): BoardgameEntity {
 export function fromFormData(formData: FormData): Boardgame {
   const name = formData.get('name')?.toString() || '';
   const image = formData.get('image')?.toString();
-  const minPlayers = formData.get('players_min') ? parseInt(formData.get('players_min')!.toString(), 10) : undefined;
-  const maxPlayers = formData.get('players_max') ? parseInt(formData.get('players_max')!.toString(), 10) : undefined;
-  const minPlayTime = formData.get('playtime_min') ? parseInt(formData.get('playtime_min')!.toString(), 10) : undefined;
-  const maxPlayTime = formData.get('playtime_max') ? parseInt(formData.get('playtime_max')!.toString(), 10) : undefined;
+  const minPlayersStr = formData.get('minPlayers') || formData.get('players_min');
+  const maxPlayersStr = formData.get('maxPlayers') || formData.get('players_max');
+  const minPlayTimeStr = formData.get('minPlayTime') || formData.get('playtime_min');
+  const maxPlayTimeStr = formData.get('maxPlayTime') || formData.get('playtime_max');
+  const _yearStr = formData.get('yearPublished') || formData.get('year_published');
+
+  const minPlayers = minPlayersStr ? parseInt(minPlayersStr.toString(), 10) : undefined;
+  const maxPlayers = maxPlayersStr ? parseInt(maxPlayersStr.toString(), 10) : undefined;
+  const minPlayTime = minPlayTimeStr ? parseInt(minPlayTimeStr.toString(), 10) : undefined;
+  const maxPlayTime = maxPlayTimeStr ? parseInt(maxPlayTimeStr.toString(), 10) : undefined;
   const publisher = formData.get('publisher')?.toString();
-  const yearPublished = formData.get('year_published') ? parseInt(formData.get('year_published')!.toString(), 10) : undefined;
+  const yearPublished = _yearStr ? parseInt(_yearStr.toString(), 10) : undefined;
 
   if (!name) {
     throw new Error('Name is required');

@@ -1,6 +1,7 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import mongoose from "mongoose";
 import { dbConnect } from "../mongoose";
+import { z } from "zod";
 
 export class Lego {
   @prop({ required: true })
@@ -36,6 +37,21 @@ export class Lego {
   @prop()
   updatedAt?: Date;
 }
+
+/**
+ * Zod schema for AI data extraction and validation.
+ * Strictly typed against the Typegoose `Lego` class to ensure the schema
+ * always stays in sync with the database model.
+ */
+export const legoSchema: z.ZodType<Partial<Lego>> = z.object({
+  name: z.string().optional().describe('The name of the Lego set'),
+  setNumber: z.string().optional().describe('The set number of the Lego set'),
+  theme: z.string().optional().describe('The theme of the Lego set (e.g., Star Wars, Technic)'),
+  image: z.string().optional().describe('A valid url to an image of the Lego set'),
+  pieceCount: z.number().optional().describe('The number of pieces in the Lego set'),
+  minifigures: z.number().optional().describe('The number of minifigures in the Lego set'),
+  yearReleased: z.number().optional().describe('The year the Lego set was released'),
+});
 
 export const LegoModel = mongoose.models.Lego || getModelForClass(Lego, {
   schemaOptions: { collection: 'lego' }

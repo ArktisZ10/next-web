@@ -89,4 +89,44 @@ describe('Given the BoardGames Page', () => {
       expect(screen.getAllByText('No Image')[0]).toBeInTheDocument();
     });
   });
+
+  describe('When search parameters are provided', () => {
+    it('Then it passes the valid parsed parameters to getBoardgames', async () => {
+      // Given
+      const searchParams = Promise.resolve({
+        q: 'Catan',
+        players: '4',
+        playtime: '60'
+      });
+
+      // When
+      await BoardGamesPage({ searchParams });
+
+      // Then
+      expect(db.getBoardgames).toHaveBeenCalledWith({
+        search: 'Catan',
+        players: 4,
+        playtime: 60
+      });
+    });
+
+    it('Then it ignores invalid parsed parameters (NaN) for players and playtime', async () => {
+      // Given
+      const searchParams = Promise.resolve({
+        q: 'Catan',
+        players: 'invalid',
+        playtime: 'invalid'
+      });
+
+      // When
+      await BoardGamesPage({ searchParams });
+
+      // Then
+      expect(db.getBoardgames).toHaveBeenCalledWith({
+        search: 'Catan',
+        players: undefined,
+        playtime: undefined
+      });
+    });
+  });
 });

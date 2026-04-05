@@ -115,6 +115,29 @@ describe('Given the database connection manager (dbConnect)', () => {
     });
   });
 
+  describe('When called concurrently before the promise resolves', () => {
+    it('Then it reuses the unresolved promise', async () => {
+      // Given
+      vi.stubEnv('MONGODB_URI', 'mongodb://localhost:27017/test');
+      let resolveMock: (v: any) => void;
+      const delayedPromise = new Promise(resolve => { resolveMock = resolve; });
+      mockConnect.mockReturnValue(delayedPromise);
+
+      const { dbConnect } = await import('./mongoose');
+      
+      // When
+      const promise1 = dbConnect();
+      const promise2 = dbConnect();
+      
+      // Then
+      expect(mockConnect).toHaveBeenCalledTimes(1); 
+      
+      // resolve
+      resolveMock!({ isConnected: true });
+      await Promise.all([promise1, promise2]);
+    });
+  });
+
   describe('When the connection fails initially and is retried', () => {
     it('Then it resets the promise and rethrows, allowing a retry to succeed', async () => {
       // Given

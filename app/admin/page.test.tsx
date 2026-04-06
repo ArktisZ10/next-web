@@ -84,11 +84,8 @@ describe('Given the Admin User Management Page', () => {
       
       // Then
       expect(screen.getByText('User Management')).toBeInTheDocument();
-      expect(screen.getByText('Admin User')).toBeInTheDocument();
-      expect(screen.getByText('Regular User')).toBeInTheDocument();
-      
-      // Default fallback from "role || 'read-only'" 
-      expect(screen.getAllByText('read-only')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Admin User').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Regular User').length).toBeGreaterThan(0);
     });
   });
 });

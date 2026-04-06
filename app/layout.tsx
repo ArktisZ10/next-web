@@ -6,6 +6,7 @@ import Link from "next/link";
 import { UserMenu } from "./_components/UserMenu";
 import { DrawerLink } from "./_components/DrawerLink";
 import { AdminDrawerLink } from "./_components/AdminDrawerLink";
+import { HouseholdDrawerLink } from "./_components/HouseholdDrawerLink";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,6 +113,7 @@ export default function RootLayout({
                   Lego
                 </DrawerLink>
               </li>
+              <HouseholdDrawerLink />
               <AdminDrawerLink />
             </ul>
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setRoleAction } from './_actions';
+import { setRoleAction, banUserAction, unbanUserAction } from './_actions';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
@@ -7,7 +7,9 @@ vi.mock('@/lib/auth', () => ({
   auth: {
     api: {
       getSession: vi.fn(),
-      setRole: vi.fn()
+      setRole: vi.fn(),
+      banUser: vi.fn(),
+      unbanUser: vi.fn()
     }
   }
 }));
@@ -96,4 +98,105 @@ describe('Admin Server Actions', () => {
       });
     });
   });
+
+  describe('Given a request to ban a user via banUserAction', () => {
+
+    describe('When the user is not logged in', () => {
+      it('Then it throws an Unauthorized error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue(null);
+
+        // When / Then
+        await expect(banUserAction(formData)).rejects.toThrow('Unauthorized');
+      });
+    });
+
+    describe('When the logged-in user does not have the admin role', () => {
+      it('Then it throws an Unauthorized error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write' } } as any);
+
+        // When / Then
+        await expect(banUserAction(formData)).rejects.toThrow('Unauthorized');
+      });
+    });
+
+    describe('When an admin user omits the userId parameter', () => {
+      it('Then it throws a Missing parameters error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'admin' } } as any);
+
+        // When / Then
+        await expect(banUserAction(formData)).rejects.toThrow('Missing parameters');
+      });
+    });
+
+    describe('When an admin user provides a valid userId', () => {
+      it('Then it bans the user and revalidates the admin path', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'admin' } } as any);
+        formData.append('userId', 'user-123');
+
+        // When
+        await banUserAction(formData);
+
+        // Then
+        expect(auth.api.banUser).toHaveBeenCalledWith(expect.objectContaining({
+          body: { userId: 'user-123' }
+        }));
+        expect(revalidatePath).toHaveBeenCalledWith('/admin');
+      });
+    });
+  });
+
+  describe('Given a request to unban a user via unbanUserAction', () => {
+
+    describe('When the user is not logged in', () => {
+      it('Then it throws an Unauthorized error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue(null);
+
+        // When / Then
+        await expect(unbanUserAction(formData)).rejects.toThrow('Unauthorized');
+      });
+    });
+
+    describe('When the logged-in user does not have the admin role', () => {
+      it('Then it throws an Unauthorized error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write' } } as any);
+
+        // When / Then
+        await expect(unbanUserAction(formData)).rejects.toThrow('Unauthorized');
+      });
+    });
+
+    describe('When an admin user omits the userId parameter', () => {
+      it('Then it throws a Missing parameters error', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'admin' } } as any);
+
+        // When / Then
+        await expect(unbanUserAction(formData)).rejects.toThrow('Missing parameters');
+      });
+    });
+
+    describe('When an admin user provides a valid userId', () => {
+      it('Then it unbans the user and revalidates the admin path', async () => {
+        // Given
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'admin' } } as any);
+        formData.append('userId', 'user-123');
+
+        // When
+        await unbanUserAction(formData);
+
+        // Then
+        expect(auth.api.unbanUser).toHaveBeenCalledWith(expect.objectContaining({
+          body: { userId: 'user-123' }
+        }));
+        expect(revalidatePath).toHaveBeenCalledWith('/admin');
+      });
+    });
+  });
 });
+

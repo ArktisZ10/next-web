@@ -2,8 +2,12 @@
 import { useTransition } from "react";
 import { setRoleAction } from "../_actions";
 
-export default function RoleSelect({ userId, currentRole }: { userId: string, currentRole: string }) {
+export default function RoleSelect({ userId, currentRole, isAdmin }: { userId: string, currentRole: string, isAdmin: boolean }) {
     const [isPending, startTransition] = useTransition();
+
+    if (isAdmin) {
+        return <span className="badge badge-ghost badge-sm">admin</span>;
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const formData = new FormData();
@@ -22,7 +26,6 @@ export default function RoleSelect({ userId, currentRole }: { userId: string, cu
             className="select select-bordered select-sm w-full max-w-xs" 
             disabled={isPending}
         >
-            <option value="admin">Admin</option>
             <option value="write">Write</option>
             <option value="read-only">Read Only</option>
         </select>

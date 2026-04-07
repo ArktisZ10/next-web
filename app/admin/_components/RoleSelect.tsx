@@ -26,8 +26,9 @@ export default function RoleSelect({ userId, currentRole, isAdmin }: { userId: s
             className="select select-bordered select-sm w-full max-w-xs" 
             disabled={isPending}
         >
-            <option value="write">Write</option>
-            <option value="read-only">Read Only</option>
+            <option value="visitor">Visitor</option>
+            <option value="verified">Verified</option>
+            <option value="household">Household</option>
         </select>
     );
 }

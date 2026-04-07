@@ -1,16 +1,15 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTodoLists } from "@/db/collections/TodoList";
 import { CreateListForm } from "./_components/CreateListForm";
 import { TodoListCard } from "./_components/TodoListCard";
+import { sessionHasPermission } from "@/lib/auth-helpers";
 
 export const revalidate = 0;
 
 export default async function HouseholdTodosPage() {
-    const session = await auth.api.getSession({ headers: await headers() });
+    const canAccess = await sessionHasPermission({ household: ["read"] });
 
-    if (session?.user?.role !== "admin") {
+    if (!canAccess) {
         redirect("/");
     }
 

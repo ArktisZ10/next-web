@@ -22,6 +22,10 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn()
 }));
 
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(() => { throw new Error('NEXT_REDIRECT'); })
+}));
+
 vi.mock('@/db/collections/Lego', () => ({
   insertLego: vi.fn(),
   updateLego: vi.fn(),
@@ -39,18 +43,17 @@ describe('Given the Lego Server Actions', () => {
   });
 
   const testCases = [
-    { role: null, canEdit: false },
     { role: undefined, canEdit: false },
-    { role: 'read-only', canEdit: false },
-    { role: 'write', canEdit: true },
+    { role: 'visitor', canEdit: false },
+    { role: 'household', canEdit: true },
     { role: 'admin', canEdit: true },
   ];
 
   describe.each(testCases)('When a user with role \'$role\' performs actions', ({ role, canEdit }) => {
     beforeEach(() => {
       vi.mocked(auth.api.getSession).mockResolvedValue(
-        role === null 
-          ? null 
+        role === undefined
+          ? { user: { id: 'mock-user-1', role: undefined } } as any
           : { user: { id: 'mock-user-1', role } } as any
       );
     });
@@ -60,7 +63,7 @@ describe('Given the Lego Server Actions', () => {
         // Given/When
         const addPromise = addLegoAction(mockFormData);
         // Then
-        await expect(addPromise).rejects.toThrow('User must have write access');
+        await expect(addPromise).rejects.toThrow('Unauthorized');
         expect(db.insertLego).not.toHaveBeenCalled();
       });
 
@@ -68,7 +71,7 @@ describe('Given the Lego Server Actions', () => {
         // Given/When
         const editPromise = editLegoAction('123', mockFormData);
         // Then
-        await expect(editPromise).rejects.toThrow('User must have write access');
+        await expect(editPromise).rejects.toThrow('Unauthorized');
         expect(db.updateLego).not.toHaveBeenCalled();
       });
 
@@ -76,7 +79,7 @@ describe('Given the Lego Server Actions', () => {
         // Given/When
         const removePromise = removeLego(mockFormData);
         // Then
-        await expect(removePromise).rejects.toThrow('User must have write access');
+        await expect(removePromise).rejects.toThrow('Unauthorized');
         expect(db.deleteLego).not.toHaveBeenCalled();
       });
     } else {

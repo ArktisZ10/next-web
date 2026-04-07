@@ -1,8 +1,7 @@
 'use server';
 
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { requirePermission } from "@/lib/auth-helpers";
 import {
     createTodoList,
     deleteTodoList,
@@ -11,19 +10,8 @@ import {
     deleteTodoItem,
 } from "@/db/collections/TodoList";
 
-async function assertAdmin() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (session?.user?.role !== "admin") {
-        throw new Error("Unauthorized");
-    }
-}
-
 export async function createListAction(formData: FormData) {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (session?.user?.role !== "admin") throw new Error("Unauthorized");
+    const session = await requirePermission({ household: ["create"] });
 
     const name = formData.get("name")?.toString().trim();
     if (!name) throw new Error("Name is required");
@@ -33,7 +21,7 @@ export async function createListAction(formData: FormData) {
 }
 
 export async function deleteListAction(formData: FormData) {
-    await assertAdmin();
+    await requirePermission({ household: ["delete"] });
 
     const listId = formData.get("listId")?.toString();
     if (!listId) throw new Error("Missing listId");
@@ -43,7 +31,7 @@ export async function deleteListAction(formData: FormData) {
 }
 
 export async function addItemAction(formData: FormData) {
-    await assertAdmin();
+    await requirePermission({ household: ["create"] });
 
     const listId = formData.get("listId")?.toString();
     const text = formData.get("text")?.toString().trim();
@@ -54,7 +42,7 @@ export async function addItemAction(formData: FormData) {
 }
 
 export async function toggleItemAction(formData: FormData) {
-    await assertAdmin();
+    await requirePermission({ household: ["update"] });
 
     const listId = formData.get("listId")?.toString();
     const itemId = formData.get("itemId")?.toString();
@@ -66,7 +54,7 @@ export async function toggleItemAction(formData: FormData) {
 }
 
 export async function deleteItemAction(formData: FormData) {
-    await assertAdmin();
+    await requirePermission({ household: ["delete"] });
 
     const listId = formData.get("listId")?.toString();
     const itemId = formData.get("itemId")?.toString();

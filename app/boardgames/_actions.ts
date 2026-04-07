@@ -2,17 +2,10 @@
 
 import { insertBoardgame, updateBoardgame, deleteBoardgame, fromFormData } from "@/db/collections/Boardgame";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
-import { headers, cookies } from "next/headers";
+import { requirePermission } from "@/lib/auth-helpers";
 
 export async function addBoardgameAction(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    const session = await requirePermission({ collection: ["create"] });
 
     const boardgame = fromFormData(formData);
 
@@ -25,13 +18,7 @@ export async function addBoardgameAction(formData: FormData) {
 }
 
 export async function editBoardgameAction(id: string, formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    const session = await requirePermission({ collection: ["update"] });
 
     const boardgame = fromFormData(formData);
 
@@ -44,13 +31,7 @@ export async function editBoardgameAction(id: string, formData: FormData) {
 }
 
 export async function removeBoardgame(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    await requirePermission({ collection: ["delete"] });
 
     const id = formData.get('id')?.toString();
     if (!id) {

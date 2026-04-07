@@ -7,8 +7,8 @@ import DeleteButton from "../_components/DeleteButton";
 import ViewToggle from "../_components/ViewToggle";
 import CollectionView from "../_components/CollectionView";
 import SearchForm from "./_components/SearchForm";
-import { auth } from "@/lib/auth";
-import { headers, cookies } from "next/headers";
+import { cookies } from "next/headers";
+import { sessionHasPermission } from "@/lib/auth-helpers";
 
 export const revalidate = 600;
 
@@ -36,15 +36,10 @@ export default async function BoardGamesPage(props: {
         players: players && !isNaN(players) ? players : undefined, 
         playtime: playtime && !isNaN(playtime) ? playtime : undefined 
     });
-    const headersList = await headers();
-    const session = await auth.api.getSession({
-        headers: headersList,
-    });
-    
     const cookieStore = await cookies();
     const currentView = cookieStore.get('boardgameView')?.value || 'table';
 
-    const hasWriteAccess = session?.user?.role === 'admin' || session?.user?.role === 'write';
+    const hasWriteAccess = await sessionHasPermission({ collection: ["create"] });
 
     return (
         <div className="p-4 md:p-8">

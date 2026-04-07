@@ -26,6 +26,10 @@ vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
 }));
 
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(() => { throw new Error('NEXT_REDIRECT'); })
+}));
+
 vi.mock('@/db/collections/TodoList', () => ({
     createTodoList: vi.fn(),
     deleteTodoList: vi.fn(),
@@ -44,20 +48,20 @@ describe('Household Todo Server Actions', () => {
 
     describe('Given a request to create a list via createListAction', () => {
         describe('When the user is not logged in', () => {
-            it('Then it throws an Unauthorized error', async () => {
+            it('Then it redirects (unauthenticated)', async () => {
                 // Given
                 vi.mocked(auth.api.getSession).mockResolvedValue(null);
                 formData.append('name', 'Shopping');
 
                 // When / Then
-                await expect(createListAction(formData)).rejects.toThrow('Unauthorized');
+                await expect(createListAction(formData)).rejects.toThrow('NEXT_REDIRECT');
             });
         });
 
         describe('When the logged-in user does not have the admin role', () => {
             it('Then it throws an Unauthorized error', async () => {
                 // Given
-                vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write', name: 'Bob' } } as any);
+                vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'visitor', name: 'Bob' } } as any);
                 formData.append('name', 'Shopping');
 
                 // When / Then
@@ -93,13 +97,13 @@ describe('Household Todo Server Actions', () => {
     });
 
     describe('Given a request to delete a list via deleteListAction', () => {
-        describe('When the user is not an admin', () => {
-            it('Then it throws an Unauthorized error', async () => {
+        describe('When the user is not logged in', () => {
+            it('Then it redirects (unauthenticated)', async () => {
                 // Given
                 vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
                 // When / Then
-                await expect(deleteListAction(formData)).rejects.toThrow('Unauthorized');
+                await expect(deleteListAction(formData)).rejects.toThrow('NEXT_REDIRECT');
             });
         });
 
@@ -137,7 +141,7 @@ describe('Household Todo Server Actions', () => {
                 vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
                 // When / Then
-                await expect(addItemAction(formData)).rejects.toThrow('Unauthorized');
+                await expect(addItemAction(formData)).rejects.toThrow('NEXT_REDIRECT');
             });
         });
 
@@ -176,7 +180,7 @@ describe('Household Todo Server Actions', () => {
                 vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
                 // When / Then
-                await expect(toggleItemAction(formData)).rejects.toThrow('Unauthorized');
+                await expect(toggleItemAction(formData)).rejects.toThrow('NEXT_REDIRECT');
             });
         });
 
@@ -206,7 +210,7 @@ describe('Household Todo Server Actions', () => {
                 vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
                 // When / Then
-                await expect(deleteItemAction(formData)).rejects.toThrow('Unauthorized');
+                await expect(deleteItemAction(formData)).rejects.toThrow('NEXT_REDIRECT');
             });
         });
 

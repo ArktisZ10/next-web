@@ -15,11 +15,13 @@ interface Permissions {
     session?:    SessionAction[];
 }
 
+type AuthorizableRole = { authorize: (permissions: Permissions) => { success: boolean } };
+
 /** Returns true if the given role string has all the requested permissions. */
 function checkPermission(roleString: string | undefined, permissions: Permissions): boolean {
     const roleNames = (roleString?.trim() || "visitor").split(",");
     for (const roleName of roleNames) {
-        const r = roles[roleName.trim() as keyof typeof roles];
+        const r = roles[roleName.trim() as keyof typeof roles] as AuthorizableRole | undefined;
         if (r && r.authorize(permissions).success) {
             return true;
         }

@@ -12,6 +12,10 @@ import { createAccessControl } from "better-auth/plugins/access";
 export const ac = createAccessControl({
     collection: ["read", "create", "update", "delete"] as const,
     household:  ["read", "create", "update", "delete"] as const,
+    // Mirrors the admin plugin's built-in defaultStatements so that the plugin's
+    // internal hasPermission() checks resolve correctly against our custom roles.
+    user:    ["create", "list", "set-role", "ban", "impersonate", "delete", "set-password", "get", "update"] as const,
+    session: ["list", "revoke", "delete"] as const,
 });
 
 /** Visitors (default, unauthenticated-equivalent): read public collections only. */
@@ -36,10 +40,12 @@ export const householdAc = ac.newRole({
     household:  ["read", "create", "update", "delete"],
 });
 
-/** Admins: same content powers as household, plus user management via the admin plugin. */
+/** Admins: same content powers as household, plus full user management via the admin plugin. */
 export const adminAc = ac.newRole({
     collection: ["read", "create", "update", "delete"],
     household:  ["read", "create", "update", "delete"],
+    user:    ["create", "list", "set-role", "ban", "impersonate", "delete", "set-password", "get", "update"],
+    session: ["list", "revoke", "delete"],
 });
 
 export const roles = {

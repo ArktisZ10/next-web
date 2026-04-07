@@ -5,10 +5,14 @@ import { roles } from "./access";
 
 type CollectionAction = "read" | "create" | "update" | "delete";
 type HouseholdAction  = "read" | "create" | "update" | "delete";
+type UserAction       = "create" | "list" | "set-role" | "ban" | "impersonate" | "delete" | "set-password" | "get" | "update";
+type SessionAction    = "list" | "revoke" | "delete";
 
 interface Permissions {
     collection?: CollectionAction[];
     household?:  HouseholdAction[];
+    user?:       UserAction[];
+    session?:    SessionAction[];
 }
 
 /** Returns true if the given role string has all the requested permissions. */
@@ -49,17 +53,7 @@ export async function requirePermission(
  * Used for user-management actions (/admin panel).
  */
 export async function requireAdmin(redirectTo = "/") {
-    const session = await auth.api.getSession({ headers: await headers() });
-
-    if (!session) {
-        redirect(redirectTo);
-    }
-
-    if (session.user.role !== "admin") {
-        throw new Error("Unauthorized");
-    }
-
-    return session;
+    return requirePermission({ user: ["list"] }, redirectTo);
 }
 
 /**

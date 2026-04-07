@@ -22,6 +22,10 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn()
 }));
 
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(() => { throw new Error('NEXT_REDIRECT'); })
+}));
+
 describe('Admin Server Actions', () => {
   let formData: FormData;
 
@@ -33,7 +37,7 @@ describe('Admin Server Actions', () => {
   describe('Given a request to change a user role via setRoleAction', () => {
     
     describe('When the user is not logged in', () => {
-      it('Then it throws an Unauthorized error', async () => {
+      it('Then it redirects (unauthenticated)', async () => {
         // Given
         vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
@@ -41,14 +45,14 @@ describe('Admin Server Actions', () => {
         const actionPromise = setRoleAction(formData);
 
         // Then
-        await expect(actionPromise).rejects.toThrow('Unauthorized');
+        await expect(actionPromise).rejects.toThrow('NEXT_REDIRECT');
       });
     });
 
     describe('When the logged-in user does not have the admin role', () => {
       it('Then it throws an Unauthorized error', async () => {
         // Given
-        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write' } } as any);
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'visitor' } } as any);
 
         // When
         const actionPromise = setRoleAction(formData);
@@ -85,14 +89,14 @@ describe('Admin Server Actions', () => {
         // Given
         vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'admin' } } as any);
         formData.append('userId', 'user-123');
-        formData.append('role', 'write');
+        formData.append('role', 'household');
 
         // When
         await setRoleAction(formData);
 
         // Then
         expect(auth.api.setRole).toHaveBeenCalledWith(expect.objectContaining({
-          body: { userId: 'user-123', role: 'write' }
+          body: { userId: 'user-123', role: 'household' }
         }));
         expect(revalidatePath).toHaveBeenCalledWith('/admin');
       });
@@ -102,19 +106,19 @@ describe('Admin Server Actions', () => {
   describe('Given a request to ban a user via banUserAction', () => {
 
     describe('When the user is not logged in', () => {
-      it('Then it throws an Unauthorized error', async () => {
+      it('Then it redirects (unauthenticated)', async () => {
         // Given
         vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
         // When / Then
-        await expect(banUserAction(formData)).rejects.toThrow('Unauthorized');
+        await expect(banUserAction(formData)).rejects.toThrow('NEXT_REDIRECT');
       });
     });
 
     describe('When the logged-in user does not have the admin role', () => {
       it('Then it throws an Unauthorized error', async () => {
         // Given
-        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write' } } as any);
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'visitor' } } as any);
 
         // When / Then
         await expect(banUserAction(formData)).rejects.toThrow('Unauthorized');
@@ -152,19 +156,19 @@ describe('Admin Server Actions', () => {
   describe('Given a request to unban a user via unbanUserAction', () => {
 
     describe('When the user is not logged in', () => {
-      it('Then it throws an Unauthorized error', async () => {
+      it('Then it redirects (unauthenticated)', async () => {
         // Given
         vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
         // When / Then
-        await expect(unbanUserAction(formData)).rejects.toThrow('Unauthorized');
+        await expect(unbanUserAction(formData)).rejects.toThrow('NEXT_REDIRECT');
       });
     });
 
     describe('When the logged-in user does not have the admin role', () => {
       it('Then it throws an Unauthorized error', async () => {
         // Given
-        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'write' } } as any);
+        vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'visitor' } } as any);
 
         // When / Then
         await expect(unbanUserAction(formData)).rejects.toThrow('Unauthorized');

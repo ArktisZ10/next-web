@@ -1,13 +1,10 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { sessionHasPermission } from "@/lib/auth-helpers";
 import { DrawerLink } from "./DrawerLink";
 
 export async function AdminDrawerLink() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+    const canAccess = await sessionHasPermission({ user: ["list"] });
 
-    if (session?.user?.role !== "admin") {
+    if (!canAccess) {
         return null;
     }
 

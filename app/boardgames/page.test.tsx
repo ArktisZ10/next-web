@@ -39,8 +39,8 @@ describe('Given the BoardGames Page', () => {
   const testCases = [
     { role: null, canEdit: false },
     { role: undefined, canEdit: false },
-    { role: 'read-only', canEdit: false },
-    { role: 'write', canEdit: true },
+    { role: 'visitor', canEdit: false },
+    { role: 'household', canEdit: true },
     { role: 'admin', canEdit: true },
   ];
 

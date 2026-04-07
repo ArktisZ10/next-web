@@ -1,10 +1,9 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getTodoList } from "@/db/collections/TodoList";
 import { AddItemForm } from "../_components/AddItemForm";
 import { TodoItemRow } from "../_components/TodoItemRow";
+import { sessionHasPermission } from "@/lib/auth-helpers";
 
 export const revalidate = 0;
 
@@ -13,9 +12,9 @@ interface Props {
 }
 
 export default async function TodoListDetailPage({ params }: Props) {
-    const session = await auth.api.getSession({ headers: await headers() });
+    const canAccess = await sessionHasPermission({ household: ["read"] });
 
-    if (session?.user?.role !== "admin") {
+    if (!canAccess) {
         redirect("/");
     }
 

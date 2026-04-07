@@ -22,6 +22,10 @@ vi.mock('./_components/AdminDrawerLink', () => ({
   AdminDrawerLink: () => <li data-testid="admin-link">Admin</li>,
 }));
 
+vi.mock('./_components/HouseholdDrawerLink', () => ({
+  HouseholdDrawerLink: () => <li data-testid="household-link">Household</li>,
+}));
+
 describe('Given the RootLayout component', () => {
   describe('When it is rendered', () => {
     it('Then it displays navigation links including Board Games, Books, and Lego', () => {

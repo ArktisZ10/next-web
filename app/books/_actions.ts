@@ -2,17 +2,10 @@
 
 import { insertBook, updateBook, deleteBook, fromFormData } from "@/db/collections/Book";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requirePermission } from "@/lib/auth-helpers";
 
 export async function addBookAction(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    const session = await requirePermission({ collection: ["create"] });
 
     const item = fromFormData(formData);
 
@@ -25,13 +18,7 @@ export async function addBookAction(formData: FormData) {
 }
 
 export async function editBookAction(id: string, formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    const session = await requirePermission({ collection: ["update"] });
 
     const item = fromFormData(formData);
 
@@ -44,13 +31,7 @@ export async function editBookAction(id: string, formData: FormData) {
 }
 
 export async function removeBook(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'write') {
-        throw new Error('User must have write access');
-    }
+    await requirePermission({ collection: ["delete"] });
 
     const id = formData.get('id')?.toString();
     if (!id) {

@@ -1,21 +1,12 @@
 'use server';
 
+import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth-helpers";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
-
-async function assertAdmin() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (session?.user?.role !== "admin") {
-        throw new Error("Unauthorized");
-    }
-}
 
 export async function setRoleAction(formData: FormData) {
-    await assertAdmin();
+    await requireAdmin();
 
     const userId = formData.get("userId")?.toString();
     const role = formData.get("role")?.toString();
@@ -31,7 +22,7 @@ export async function setRoleAction(formData: FormData) {
 }
 
 export async function banUserAction(formData: FormData) {
-    await assertAdmin();
+    await requireAdmin();
 
     const userId = formData.get("userId")?.toString();
 
@@ -45,7 +36,7 @@ export async function banUserAction(formData: FormData) {
 }
 
 export async function unbanUserAction(formData: FormData) {
-    await assertAdmin();
+    await requireAdmin();
 
     const userId = formData.get("userId")?.toString();
 

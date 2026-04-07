@@ -1,5 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 import { adminClient } from "better-auth/client/plugins";
+import { ac, roles } from "./access";
 
 function getBaseURL() {
   // Browser: best source of truth (works for custom domains + previews)
@@ -30,7 +31,7 @@ function getBaseURL() {
 
 export const authClient = createAuthClient({
   baseURL: getBaseURL(),
-  plugins: [adminClient()],
+  plugins: [adminClient({ ac, roles })],
 });
 
 export const { signOut, useSession } = authClient;

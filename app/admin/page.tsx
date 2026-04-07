@@ -1,20 +1,12 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdmin } from "@/lib/auth-helpers";
 import { getDb } from "@/db/client";
-import { redirect } from "next/navigation";
 import UserTable from "./_components/UserTable";
 import type { UserRow } from "./_components/UserTable";
 
 export const revalidate = 0;
 
 export default async function AdminPage() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (session?.user?.role !== "admin") {
-        redirect("/");
-    }
+    await requireAdmin("/");
 
     const db = await getDb();
     const rawUsers = await db.collection("user").find({}).toArray();

@@ -32,6 +32,7 @@ export const TodoListModel =
   mongoose.models.TodoList ||
   getModelForClass(TodoList, {
     schemaOptions: { collection: "todolist" },
+    options: { customName: "TodoList" },
   });
 
 export interface TodoItemEntity extends TodoItem {

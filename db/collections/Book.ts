@@ -54,7 +54,8 @@ export const bookSchema: z.ZodType<Partial<Book>> = z.object({
 });
 
 export const BookModel = mongoose.models.Book || getModelForClass(Book, {
-  schemaOptions: { collection: 'book' }
+  schemaOptions: { collection: 'book' },
+  options: { customName: 'Book' },
 });
 
 export interface BookEntity extends Book {

@@ -58,7 +58,8 @@ export const boardgameSchema: z.ZodType<Partial<Boardgame>> = z.object({
 });
 
 export const BoardgameModel = mongoose.models.Boardgame || getModelForClass(Boardgame, {
-  schemaOptions: { collection: 'boardgame' }
+  schemaOptions: { collection: 'boardgame' },
+  options: { customName: 'Boardgame' },
 });
 
 export interface BoardgameEntity extends Boardgame {

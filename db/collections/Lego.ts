@@ -54,7 +54,8 @@ export const legoSchema: z.ZodType<Partial<Lego>> = z.object({
 });
 
 export const LegoModel = mongoose.models.Lego || getModelForClass(Lego, {
-  schemaOptions: { collection: 'lego' }
+  schemaOptions: { collection: 'lego' },
+  options: { customName: 'Lego' },
 });
 
 export interface LegoEntity extends Lego {

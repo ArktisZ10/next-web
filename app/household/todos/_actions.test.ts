@@ -94,6 +94,22 @@ describe('Household Todo Server Actions', () => {
                 expect(revalidatePath).toHaveBeenCalledWith('/household/todos');
             });
         });
+
+        describe('When a household user provides a valid name', () => {
+            it('Then it creates the list and revalidates the todos path', async () => {
+                // Given
+                vi.mocked(auth.api.getSession).mockResolvedValue({ user: { role: 'household', name: 'Alice', email: 'alice@example.com' } } as any);
+                vi.mocked(TodoListDb.createTodoList).mockResolvedValue({ id: 'list-2', name: 'Groceries', items: [] } as any);
+                formData.append('name', 'Groceries');
+
+                // When
+                await createListAction(formData);
+
+                // Then
+                expect(TodoListDb.createTodoList).toHaveBeenCalledWith('Groceries', 'Alice');
+                expect(revalidatePath).toHaveBeenCalledWith('/household/todos');
+            });
+        });
     });
 
     describe('Given a request to delete a list via deleteListAction', () => {
